@@ -22,7 +22,11 @@ public class Controller {
             while (!quit) {
                 view.printPrompt();
                 Command cmd = cli.readCommand();
-                interpreter.executeCommand(cmd);
+                boolean success = interpreter.executeCommand(cmd);
+                view.printResult(interpreter.getCommandOutput());
+                if (!success) {
+                    view.printError(interpreter.getErrorCode());
+                }
                 quit = interpreter.getQuitFlag();
             }
         }

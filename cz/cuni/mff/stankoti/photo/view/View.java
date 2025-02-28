@@ -1,11 +1,11 @@
 package cz.cuni.mff.stankoti.photo.view;
 
-public class View {
-    public void printPrompt() {
-        String prompt = "> ";
-        System.out.print(prompt);
-    }
+import java.util.ArrayList;
 
+import cz.cuni.mff.stankoti.photo.errors.ErrorCode;
+import cz.cuni.mff.stankoti.photo.errors.ErrorMessages;
+
+public class View {
     public void fullProgramInfo() {
         String version = "0.1";
         String projectName = "Photo Organizer";
@@ -20,5 +20,20 @@ public class View {
         System.out.println("(c) " + author + ", " + email);
         System.out.println(university);
         System.out.println();
+    }
+
+    public void printPrompt() {
+        String prompt = "> ";
+        System.out.print(prompt);
+    }
+
+    public void printResult(ArrayList<String> output) {
+        for (String str : output) {
+            System.out.println(str);
+        }
+    }
+
+    public void printError(ErrorCode errorCode) {
+        System.out.println(ErrorMessages.getErrorMessage(errorCode));
     }
 }
