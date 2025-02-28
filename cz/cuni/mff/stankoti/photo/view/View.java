@@ -1,6 +1,11 @@
 package cz.cuni.mff.stankoti.photo.view;
 
 public class View {
+    public void printPrompt() {
+        String prompt = "> ";
+        System.out.print(prompt);
+    }
+
     public void fullProgramInfo() {
         String version = "0.1";
         String projectName = "Photo Organizer";
