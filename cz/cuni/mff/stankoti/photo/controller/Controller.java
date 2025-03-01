@@ -4,30 +4,25 @@ import cz.cuni.mff.stankoti.photo.db.*;
 import cz.cuni.mff.stankoti.photo.view.*;
 
 public class Controller {
-    private CmdInterpreter interpreter;
-    private DB db;
     private View view;
+    private DB db;
+    private CmdInterpreter interpreter;
 
     public Controller() {
-        interpreter = new CmdInterpreter();
-        db = new DB();
         view = new View();
+        view.fullProgramInfo();
+        interpreter = new CmdInterpreter(db, view);
     }
 
     public void run() {
-        view.fullProgramInfo();
-
+        view.print("");
         try (CLI cli = new CLI()) {
             boolean quit = false;
             while (!quit) {
                 view.printPrompt();
                 Command cmd = cli.readCommand();
-                boolean success = interpreter.executeCommand(cmd);
-                view.printResult(interpreter.getCommandOutput());
-                if (!success) {
-                    view.printError(interpreter.getErrorCode());
-                }
-                quit = interpreter.getQuitFlag();
+                interpreter.executeCommand(cmd);
+                quit = interpreter.getQuitSignal();
             }
         }
     }

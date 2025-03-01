@@ -3,51 +3,45 @@ package cz.cuni.mff.stankoti.photo.controller;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-import cz.cuni.mff.stankoti.photo.errors.*;
+import cz.cuni.mff.stankoti.photo.status.StatusCode;
 import cz.cuni.mff.stankoti.photo.db.*;
+import cz.cuni.mff.stankoti.photo.view.*;
 
 public class CmdInterpreter {
-    private ErrorCode errorCode;
-    private boolean quitFlag;
-    private ArrayList<String> commandOutput;
+    private DB db;
+    private View view;
+    private StatusCode statusCode;
+    private boolean quitSignal;
 
-    public CmdInterpreter() {
-        errorCode = ErrorCode.NO_ERROR;
-        quitFlag = false;
-        clearCommandOutput();
+    public CmdInterpreter(DB db, View view) {
+        this.db = db;
+        this.view = view;
+        statusCode = StatusCode.NO_ERROR;
+        quitSignal = false;
     }
 
-    public ErrorCode getErrorCode() {
-        return errorCode;
+    public StatusCode getStatusCode() {
+        return statusCode;
     }
 
-    public void setErrorCode(ErrorCode errorCode) {
-        this.errorCode = errorCode;
+    public void setStatusCode(StatusCode statusCode) {
+        this.statusCode = statusCode;
     }
 
-    public boolean getQuitFlag() {
-        return quitFlag;
+    public boolean getQuitSignal() {
+        return quitSignal;
     }
 
-    public void setQuitFlag(boolean quitFlag) {
-        this.quitFlag = quitFlag;
-    }
-
-    public void clearCommandOutput() {
-        commandOutput = new ArrayList<>();
-    }
-
-    public ArrayList<String> getCommandOutput() {
-        return commandOutput;
+    public void setQuitSignal(boolean quitSignal) {
+        this.quitSignal = quitSignal;
     }
 
     public void print(String str) {
-        commandOutput.add(str);
+        view.print(str);
     }
 
     public boolean executeCommand(Command cmd) {
-        setErrorCode(ErrorCode.NO_ERROR);
-        clearCommandOutput();
+        setStatusCode(StatusCode.NO_ERROR);
 
         String command = cmd.command.toUpperCase();
 
@@ -65,11 +59,14 @@ public class CmdInterpreter {
             case "DUP", "DD", "DUPLICATES" -> duplicates(cmd.args);
             case "S", "SCAN" -> scan(cmd.args);
 
-            default -> setErrorCode(ErrorCode.UNKNOWN_COMMAND);
+            default -> {
+                setStatusCode(StatusCode.UNKNOWN_COMMAND);
+                view.printStatus(getStatusCode());
+            }
         }
 
         boolean success = true;
-        if (getErrorCode() != ErrorCode.NO_ERROR)
+        if (getStatusCode() != StatusCode.NO_ERROR)
             success = false;
         
         return success;
@@ -111,7 +108,7 @@ public class CmdInterpreter {
     }
 
     private void exit() {
-        setQuitFlag(true);
+        setQuitSignal(true);
     }
 
     private void save(String[] args) {

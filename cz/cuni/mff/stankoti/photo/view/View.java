@@ -1,9 +1,7 @@
 package cz.cuni.mff.stankoti.photo.view;
 
-import java.util.ArrayList;
-
-import cz.cuni.mff.stankoti.photo.errors.ErrorCode;
-import cz.cuni.mff.stankoti.photo.errors.ErrorMessages;
+import cz.cuni.mff.stankoti.photo.status.StatusCode;
+import cz.cuni.mff.stankoti.photo.status.StatusMessages;
 
 public class View {
     public void fullProgramInfo() {
@@ -27,13 +25,11 @@ public class View {
         System.out.print(prompt);
     }
 
-    public void printResult(ArrayList<String> output) {
-        for (String str : output) {
-            System.out.println(str);
-        }
+    public void print(String line) {
+        System.out.println(line);
     }
 
-    public void printError(ErrorCode errorCode) {
-        System.out.println(ErrorMessages.getErrorMessage(errorCode));
+    public void printStatus(StatusCode statusCode) {
+        System.out.println(StatusMessages.getStatusMessage(statusCode));
     }
 }
