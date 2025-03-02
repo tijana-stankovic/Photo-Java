@@ -1,5 +1,7 @@
 package cz.cuni.mff.stankoti.photo.controller;
 
+import cz.cuni.mff.stankoti.photo.view.View;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -44,6 +46,31 @@ public class CLI implements AutoCloseable {
         }
         Command command = new Command(cmd, cmdArgs);
         return command;
+    }
+
+    public Character askYesNo(View view, String message, boolean cancel) {
+        String prompt = cancel ? " (Yes/No/Cancel)" : " (Yes/No)";
+        String response;
+
+        while (true) {
+            view.print(message + prompt + ": ", false);
+            try {
+                response = input.readLine().trim().toLowerCase();
+            } catch (IOException e) {
+                System.err.println("IOException occurred while reading input");
+                continue;
+            }
+
+            if (response.equals("y") || response.equals("yes")) {
+                return 'Y';
+            } else if (response.equals("n") || response.equals("no")) {
+                return 'N';
+            } else if (cancel && (response.equals("c") || response.equals("cancel"))) {
+                return 'C';
+            } else {
+                view.print("Invalid response. Please enter 'Yes', 'No'" + (cancel ? ", or 'Cancel'" : "") + ".");
+            }
+        }
     }
 
     @Override

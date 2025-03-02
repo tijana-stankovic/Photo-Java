@@ -29,6 +29,14 @@ public class View {
         System.out.println(line);
     }
 
+    public void print(String line, boolean newLine) {
+        if (newLine) {
+            System.out.println(line);
+        } else {
+            System.out.print(line);
+        }
+    }
+
     public void printStatus(StatusCode statusCode) {
         System.out.println(StatusMessages.getStatusMessage(statusCode));
     }
