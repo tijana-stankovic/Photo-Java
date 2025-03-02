@@ -1,0 +1,36 @@
+- Proveravaj da li vec postoji fajl sa istim id (pa vidi da li treba da prikazes upozorenje ili sta)
+- Kreiraj u DB:
+   dictionary-je za sve atribute (za pretrazivanje)
+- Drugacije obradi exception situacije u writeDB
+- Pri snimanju, ako ne uspe da snimi, vraca kod greske, pa se ispisuje odgovarajuca poruka
+- Pri ucitavanju, ako uspe ucitavanje, ispise informacije o nekim statistikama (npr. o broju fajlova u bazi i sl)
+
+
+=======================================================
+Startovanje iz komandne linije:
+- postavi se u root dir projekta
+- prevedi sve .java fajlove sa:
+    javac cz/cuni/mff/stankoti/photo/*.java
+- pokretanje programa sa:
+    java cz.cuni.mff.stankoti.photo.Photo
+
+=======================================================
+Ovo sam probao, ali nije htelo da radi:
+
+Java programs do not compile into a standalone .exe by default. 
+Instead, they produce .class files that require the Java Virtual Machine (JVM) to execute. 
+This is why you always run your program using:
+    java x.y.z.Class-with-main
+Ako zelimo nesto slicno pokretanju 'exe' fajla, onda uraditi sledece (Create a JAR File):
+- Compile the Java files
+    javac -d out cz/cuni/mff/stankoti/photo/*.java
+  This places the compiled .class files inside the out/ directory.
+- Create a manifest file (e.g., manifest.txt) sa sadrzajem:
+    Main-Class: cz.cuni.mff.stankoti.photo.Photo
+  (Ensure there is an empty line at the end.)
+- Package everything into a JAR
+    jar cfm PhotoApp.jar manifest.txt -C out .
+- Run the JAR file (Now, instead of java x.y.z.Photo, you can just run that):
+    java -jar PhotoApp.jar
+  Bonus: You can double-click the JAR file to run it on most systems!
+

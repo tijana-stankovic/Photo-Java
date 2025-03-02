@@ -1,11 +1,11 @@
 package cz.cuni.mff.stankoti.photo.controller;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
 import cz.cuni.mff.stankoti.photo.status.StatusCode;
 import cz.cuni.mff.stankoti.photo.db.*;
 import cz.cuni.mff.stankoti.photo.view.*;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 public class CmdInterpreter {
     private DB db;
@@ -40,7 +40,7 @@ public class CmdInterpreter {
         view.print(str);
     }
 
-    public boolean executeCommand(Command cmd) {
+    public void executeCommand(Command cmd) {
         setStatusCode(StatusCode.NO_ERROR);
 
         String command = cmd.command.toUpperCase();
@@ -64,12 +64,6 @@ public class CmdInterpreter {
                 view.printStatus(getStatusCode());
             }
         }
-
-        boolean success = true;
-        if (getStatusCode() != StatusCode.NO_ERROR)
-            success = false;
-        
-        return success;
     }
 
     private void help(String[] args) {
@@ -113,34 +107,30 @@ public class CmdInterpreter {
 
     private void save(String[] args) {
         print("Save...");
+        db.WriteDB();
+    }
 
-
-        ArrayList<File> files = new ArrayList<>();
-        files.add(new File(1, 
+    private void add(String[] args) {
+        print("Add...");
+        db.addFile(new File(db.nextFileID(), 
                     "/path/to/file1", 
                     "file1.txt", 
                     ".txt", 
                     "2025-02-21", 
                     1024, 
                     123456789L, 
-                    Arrays.asList("example1", "document1"), 
-                    Arrays.asList("metadata1-1", "metadata1-2")));
-        files.add(new File(2, 
+                    new HashSet<>(Arrays.asList("example1", "document1")), 
+                    new HashSet<>(Arrays.asList("metadata1-1", "metadata1-2"))));
+
+        db.addFile(new File(2, 
                     "/path/to/file2", 
                     "file2.txt", 
                     ".txt", 
                     "2025-02-22", 
                     1025, 
                     123456790L, 
-                    Arrays.asList("example2", "document2"), 
-                    Arrays.asList("metadata2-1", "metadata2-2")));
-        DB.WriteDB(files, "test.db");
-        files = new ArrayList<>();
-        files = DB.ReadDB("test.db");
-    }
-
-    private void add(String[] args) {
-        print("Add...");
+                    new HashSet<>(Arrays.asList("example2", "document2")), 
+                    new HashSet<>(Arrays.asList("metadata2-1", "metadata2-2")))); 
     }
 
     private void addKeyword(String[] args) {

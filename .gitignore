@@ -1,4 +1,6 @@
 .vscode/
+# Photo Organizer database files
+*.pdb
 
 # Compiled class file
 *.class
