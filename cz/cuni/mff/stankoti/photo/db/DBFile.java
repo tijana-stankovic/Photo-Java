@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class File implements Serializable {  // Implement the Serializable interface
+public class DBFile implements Serializable {  // Implement the Serializable interface
     private static final long serialVersionUID = 1L;
     private int id;
     private String location;
@@ -17,7 +17,7 @@ public class File implements Serializable {  // Implement the Serializable inter
     private Set<String> metadata;    
 
     // This constructor is required for deserialization
-    public File() {
+    public DBFile() {
         id = 0;
         location = "";
         filename = "";
@@ -29,7 +29,7 @@ public class File implements Serializable {  // Implement the Serializable inter
         metadata = new HashSet<>();
     }
 
-    public File(int id, 
+    public DBFile(int id, 
                 String location, String filename, String extension, 
                 String timestamp, int size, long checksum, 
                 Set<String> keywords, Set<String> metadata) {

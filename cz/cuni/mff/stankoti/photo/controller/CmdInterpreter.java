@@ -138,7 +138,7 @@ public class CmdInterpreter {
     private void add(String[] args) {
         print("Add...");
         int fileID = db.nextFileID();
-        if (db.addFile(new File(fileID, 
+        if (db.addFile(new DBFile(fileID, 
                     "/path/to/file1", 
                     "file1.txt", 
                     ".txt", 
@@ -153,7 +153,7 @@ public class CmdInterpreter {
         }
 
         fileID = db.nextFileID();
-        if (db.addFile(new File(fileID,
+        if (db.addFile(new DBFile(fileID,
                     "/path/to/file2", 
                     "file2.txt", 
                     ".txt", 

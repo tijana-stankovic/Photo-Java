@@ -9,7 +9,7 @@ import java.util.Set;
 public class DBData implements Serializable {  // Implement the Serializable interface
     private static final long serialVersionUID = 1L;
     private int lastFileID;
-    private Map<Integer, File> files;
+    private Map<Integer, DBFile> files;
     private Map<String, Set<Integer>> locations;
     private Map<String, Set<Integer>> filenames;
     private Map<String, Set<Integer>> extensions;
@@ -45,11 +45,11 @@ public class DBData implements Serializable {  // Implement the Serializable int
         return getLastFileID();
     }
 
-    public File getFile(int fileID) {
+    public DBFile getFile(int fileID) {
         return files.getOrDefault(fileID, null);
     }
         
-    public void addFile(File file) {
+    public void addFile(DBFile file) {
         files.put(file.getID(), file);
     }
 

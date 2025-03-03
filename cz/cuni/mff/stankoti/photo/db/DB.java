@@ -73,7 +73,7 @@ public class DB {
         }
     }
 
-    public int addFile(File file) {
+    public int addFile(DBFile file) {
         int oldFileID = data.getFileID(file.getLocation(), file.getFilename(), file.getExtension());
 
         if (oldFileID != 0) {
@@ -101,7 +101,7 @@ public class DB {
     }
 
     public void removeFile(int fileID) {
-        File file = data.getFile(fileID);
+        DBFile file = data.getFile(fileID);
         data.removeFile(fileID);
         data.removeFileLocation(file.getLocation(), fileID);
         data.removeFileFilename(file.getFilename(), fileID);
