@@ -46,6 +46,7 @@ public class Controller {
     public void run() {
         view.print("");
         try (CLI cli = new CLI()) {
+            interpreter.setCLI(cli);
             boolean quit = false;
             while (!quit) {
                 view.printPrompt();

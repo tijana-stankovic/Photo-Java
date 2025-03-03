@@ -48,14 +48,14 @@ public class DBData implements Serializable {  // Implement the Serializable int
     public File getFile(int fileID) {
         return files.getOrDefault(fileID, null);
     }
-
+        
     public void addFile(File file) {
-        files.put(file.getId(), file);
+        files.put(file.getID(), file);
     }
 
-    public void removeFile(int fileId) {
-        if (files.containsKey(fileId)) {
-            files.remove(fileId);
+    public void removeFile(int fileID) {
+        if (files.containsKey(fileID)) {
+            files.remove(fileID);
         }
     }
 

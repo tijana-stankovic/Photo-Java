@@ -16,7 +16,7 @@ public class DB {
     private DBData data;
 
     private String dbFilename;
-    private transient boolean saved = false;
+    private transient boolean dataChanged = true;
     private StatusCode statusCode;
 
     public DB(String dbFilename) {
@@ -26,12 +26,20 @@ public class DB {
         ReadDB();
     }
 
-    public boolean getSaved() {
-        return saved;
+    public boolean isChanged() {
+        return dataChanged;
     }
-    
-    public void setSaved(boolean saved) {
-        this.saved = saved;
+
+    public boolean isSaved() {
+        return !dataChanged;
+    }
+
+    public void dataChanged(boolean dataChanged) {
+        this.dataChanged = dataChanged;
+    }
+
+    public void dataSaved(boolean dataSaved) {
+        dataChanged = !dataSaved;
     }
 
     public StatusCode getStatusCode() {
@@ -45,7 +53,7 @@ public class DB {
     public void ReadDB() {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(dbFilename))) {
             data = (DBData) in.readObject();
-            setSaved(true);
+            dataChanged(false);
         } catch (FileNotFoundException e) { // File not found
             setStatusCode(StatusCode.DB_FILE_DOES_NOT_EXIST);
         } catch (ClassNotFoundException | InvalidClassException e ) { // Class not found or Class version mismatch
@@ -59,20 +67,56 @@ public class DB {
     public void WriteDB() {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(dbFilename))) {
             out.writeObject(data);
-            setSaved(true);
+            dataSaved(true);
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public void addFile(File file) {
+    public int addFile(File file) {
+        int oldFileID = data.getFileID(file.getLocation(), file.getFilename(), file.getExtension());
+
+        if (oldFileID != 0) {
+            removeFile(oldFileID);
+        }
+
         data.addFile(file);
-        setSaved(false);
+        int fileID = file.getID();
+        data.addFileLocation(file.getLocation(), fileID);
+        data.addFileFilename(file.getFilename(), fileID);
+        data.addFileExtension(file.getExtension(), fileID);
+        data.addFileTimestamp(file.getTimestamp(), fileID);
+        data.addFileSize(file.getSize(), fileID);
+        data.addFileChecksum(file.getChecksum(), fileID);
+        for (String keyword : file.getKeywords()) {
+            data.addFileKeyword(keyword, fileID);
+        }
+        for (String metadataString : file.getMetadata()) {
+            data.addFileKeyword(metadataString, fileID);
+        }
+    
+        dataChanged(true);
+
+        return oldFileID;
     }
 
-    public void removeFile(int fileId) {
-        data.removeFile(fileId);
-        setSaved(false);
+    public void removeFile(int fileID) {
+        File file = data.getFile(fileID);
+        data.removeFile(fileID);
+        data.removeFileLocation(file.getLocation(), fileID);
+        data.removeFileFilename(file.getFilename(), fileID);
+        data.removeFileExtension(file.getExtension(), fileID);
+        data.removeFileTimestamp(file.getTimestamp(), fileID);
+        data.removeFileSize(file.getSize(), fileID);
+        data.removeFileChecksum(file.getChecksum(), fileID);
+        for (String keyword : file.getKeywords()) {
+            data.removeFileKeyword(keyword, fileID);
+        }
+        for (String metadataString : file.getMetadata()) {
+            data.removeFileKeyword(metadataString, fileID);
+        }
+
+        dataChanged(true);
     }
 
     public int nextFileID() {

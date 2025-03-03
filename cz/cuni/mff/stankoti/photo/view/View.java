@@ -36,7 +36,7 @@ public class View {
             System.out.print(line);
         }
     }
-
+        
     public void printStatus(StatusCode statusCode) {
         System.out.println(StatusMessages.getStatusMessage(statusCode));
     }

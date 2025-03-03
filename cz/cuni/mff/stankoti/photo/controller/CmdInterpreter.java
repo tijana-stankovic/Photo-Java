@@ -12,12 +12,14 @@ public class CmdInterpreter {
     private View view;
     private StatusCode statusCode;
     private boolean quitSignal;
+    private CLI cli;
 
     public CmdInterpreter(DB db, View view) {
         this.db = db;
         this.view = view;
         statusCode = StatusCode.NO_ERROR;
         quitSignal = false;
+        cli = null;
     }
 
     public StatusCode getStatusCode() {
@@ -34,6 +36,10 @@ public class CmdInterpreter {
 
     public void setQuitSignal(boolean quitSignal) {
         this.quitSignal = quitSignal;
+    }
+
+    public void setCLI(CLI cli) {
+        this.cli = cli;
     }
 
     public void print(String str) {
@@ -102,17 +108,37 @@ public class CmdInterpreter {
     }
 
     private void exit() {
-        setQuitSignal(true);
+        if (db.isChanged()) {
+            assert cli != null : "Interpreter CLI is not initialized!";
+
+            Character response = cli.askYesNo(view, "There are unsaved changes. Do you want to save them?", true);
+            switch (response) {
+                case 'Y' -> {
+                    db.WriteDB();
+                    setQuitSignal(true);
+                }
+                case 'N' -> setQuitSignal(true);
+                case 'C' -> { }
+                default -> { }
+            }
+        } else {
+            setQuitSignal(true);
+        }
     }
 
     private void save(String[] args) {
-        print("Save...");
-        db.WriteDB();
+        if (db.isChanged()) {
+            db.WriteDB();
+            view.print("Changes saved successfully.");
+        } else {
+            view.print("There are no changes to save.");
+        }
     }
 
     private void add(String[] args) {
         print("Add...");
-        db.addFile(new File(db.nextFileID(), 
+        int fileID = db.nextFileID();
+        if (db.addFile(new File(fileID, 
                     "/path/to/file1", 
                     "file1.txt", 
                     ".txt", 
@@ -120,9 +146,14 @@ public class CmdInterpreter {
                     1024, 
                     123456789L, 
                     new HashSet<>(Arrays.asList("example1", "document1")), 
-                    new HashSet<>(Arrays.asList("metadata1-1", "metadata1-2"))));
+                    new HashSet<>(Arrays.asList("metadata1-1", "metadata1-2")))) == 0) {
+            print("New file is added.");
+        } else {
+            print("File is updated.");
+        }
 
-        db.addFile(new File(2, 
+        fileID = db.nextFileID();
+        if (db.addFile(new File(fileID,
                     "/path/to/file2", 
                     "file2.txt", 
                     ".txt", 
@@ -130,7 +161,11 @@ public class CmdInterpreter {
                     1025, 
                     123456790L, 
                     new HashSet<>(Arrays.asList("example2", "document2")), 
-                    new HashSet<>(Arrays.asList("metadata2-1", "metadata2-2")))); 
+                    new HashSet<>(Arrays.asList("metadata2-1", "metadata2-2")))) == 0) {
+                    print("New file is added.");
+        } else {
+            print("File is updated.");
+        }
     }
 
     private void addKeyword(String[] args) {
