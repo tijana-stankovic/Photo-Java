@@ -11,7 +11,7 @@ public class DBFile implements Serializable {  // Implement the Serializable int
     private String filename;
     private String extension;
     private String timestamp;
-    private int size;
+    private long size;
     private long checksum;
     private Set<String> keywords;
     private Set<String> metadata;    
@@ -23,7 +23,7 @@ public class DBFile implements Serializable {  // Implement the Serializable int
         filename = "";
         extension = "";
         timestamp = "";
-        size = 0;
+        size = 0L;
         checksum = 0L;
         keywords = new HashSet<>();
         metadata = new HashSet<>();
@@ -31,7 +31,7 @@ public class DBFile implements Serializable {  // Implement the Serializable int
 
     public DBFile(int id, 
                 String location, String filename, String extension, 
-                String timestamp, int size, long checksum, 
+                String timestamp, long size, long checksum, 
                 Set<String> keywords, Set<String> metadata) {
         setID(id);
         setLocation(location);
@@ -89,11 +89,11 @@ public class DBFile implements Serializable {  // Implement the Serializable int
         this.timestamp = timestamp;
     }
 
-    public int getSize() {
+    public long getSize() {
         return size;
     }
 
-    public void setSize(int size) {
+    public void setSize(long size) {
         assert size >= 0 : "Size must not be negative!";
         this.size = size;
     }

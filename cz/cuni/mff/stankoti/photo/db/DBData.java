@@ -14,7 +14,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     private Map<String, Set<Integer>> filenames;
     private Map<String, Set<Integer>> extensions;
     private Map<String, Set<Integer>> timestamps;
-    private Map<Integer, Set<Integer>> sizes;
+    private Map<Long, Set<Integer>> sizes;
     private Map<Long, Set<Integer>> checksums;
     private Map<String, Set<Integer>> keywords;
     private Map<String, Set<Integer>> metadata;
@@ -115,11 +115,11 @@ public class DBData implements Serializable {  // Implement the Serializable int
         }
     }
 
-    public void addFileSize(int size, int fileID) {
+    public void addFileSize(long size, int fileID) {
         sizes.computeIfAbsent(size, k -> new HashSet<>()).add(fileID);
     }
 
-    public void removeFileSize(int size, int fileID) {
+    public void removeFileSize(long size, int fileID) {
         Set<Integer> fileIDs = sizes.get(size);
         if (fileIDs != null) {
             fileIDs.remove(fileID);
