@@ -13,6 +13,9 @@ public class StatusMessages {
         statusMessages.put(StatusCode.DB_FILE_INCOMPATIBLE_FORMAT, "ERROR: The database file is in incompatible format.");
         statusMessages.put(StatusCode.DB_FILE_READ_ERROR, "ERROR: An error occurred while reading the database file.");
         statusMessages.put(StatusCode.DB_FILE_WRITE_ERROR, "ERROR: An error occurred while writing to the database file.");
+        statusMessages.put(StatusCode.INVALID_NUMBER_OF_ARGUMENTS, "ERROR: Invalid number of arguments.");
+        statusMessages.put(StatusCode.PATH_DOES_NOT_EXIST, "ERROR: Path does not exists.");
+        statusMessages.put(StatusCode.FILE_SYSTEM_ERROR, "ERROR: Error reading file system.");
     }
 
     public static String getStatusMessage(StatusCode statusCode) {

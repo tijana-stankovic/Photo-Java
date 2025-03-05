@@ -104,4 +104,30 @@ public class FileSystem {
     public static long calculateChecksum(File file) {
         return 0L;
     }
+
+    public static String extractFilename(String filename) {
+        // Find the last occurrence of the file separator
+        int lastSeparatorIndex = filename.lastIndexOf('/');
+        if (lastSeparatorIndex == -1) {
+            lastSeparatorIndex = filename.lastIndexOf('\\');
+        }
+    
+        // Extract the filename
+        String filenameOnly = (lastSeparatorIndex == -1) ? filename : filename.substring(lastSeparatorIndex + 1);
+    
+        return filenameOnly;
+    }
+
+    public static String formatFileSize(long sizeInBytes) {
+        final String[] units = {"B", "KB", "MB", "GB", "TB"};
+        double size = sizeInBytes;
+        int unitIndex = 0;
+
+        while (size >= 1024 && unitIndex < units.length - 1) {
+            size /= 1024;
+            unitIndex++;
+        }
+
+        return String.format("%.2f %s", size, units[unitIndex]);
+    }    
 }

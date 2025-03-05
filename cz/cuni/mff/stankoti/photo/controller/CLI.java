@@ -48,7 +48,7 @@ public class CLI implements AutoCloseable {
         return command;
     }
 
-    public Character askYesNo(View view, String message, boolean cancel) {
+    public char askYesNo(View view, String message, boolean cancel) {
         String prompt = cancel ? " (Yes/No/Cancel)" : " (Yes/No)";
         String response;
 
