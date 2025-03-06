@@ -92,7 +92,7 @@ public class DB {
             data.addFileKeyword(keyword, fileID);
         }
         for (String metadataString : file.getMetadata()) {
-            data.addFileKeyword(metadataString, fileID);
+            data.addFileMetadata(metadataString, fileID);
         }
     
         dataChanged(true);
@@ -113,7 +113,7 @@ public class DB {
             data.removeFileKeyword(keyword, fileID);
         }
         for (String metadataString : file.getMetadata()) {
-            data.removeFileKeyword(metadataString, fileID);
+            data.removeFileMetadata(metadataString, fileID);
         }
 
         dataChanged(true);

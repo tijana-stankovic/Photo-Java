@@ -48,7 +48,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     public DBFile getFile(int fileID) {
         return files.getOrDefault(fileID, null);
     }
-        
+
     public void addFile(DBFile file) {
         files.put(file.getID(), file);
     }

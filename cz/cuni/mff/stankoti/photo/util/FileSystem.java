@@ -1,6 +1,8 @@
 package cz.cuni.mff.stankoti.photo.util;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -9,6 +11,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.zip.CRC32;
+
+import com.drew.imaging.ImageMetadataReader;
+import com.drew.imaging.ImageProcessingException;
+import com.drew.metadata.Directory;
+import com.drew.metadata.Metadata;
+import com.drew.metadata.Tag;
 
 import cz.cuni.mff.stankoti.photo.db.DBFile;
 
@@ -33,11 +42,11 @@ public class FileSystem {
         if (dir.isDirectory()) {
             try {
                 // add the full absolute directory path as the first element in the result
-                listOfFiles.add(dir.getCanonicalPath());
+                listOfFiles.add(dir.getCanonicalPath()); 
 
                 for (File file : dir.listFiles()) {
                     if (file.isFile()) {
-                        listOfFiles.add(file.getCanonicalPath());
+                        listOfFiles.add(file.getCanonicalPath()); 
                     }
                 }
             } catch (IOException e) {
@@ -48,7 +57,7 @@ public class FileSystem {
         return listOfFiles;
     }
 
-    public static DBFile getFileInformation(String filename) {
+    public static DBFile getFileInformation(String filename) {        
         String location = "";
         String fname = "";
         String extension = "";
@@ -77,13 +86,13 @@ public class FileSystem {
                     fname = fullName;
                 }
 
-                // HH for 24-hour format,
+                // HH for 24-hour format, 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss").withZone(ZoneId.systemDefault());  // Use system timezone
                 timestamp = formatter.format(Instant.ofEpochMilli(file.lastModified()));
 
                 size = file.length();
                 checksum = calculateChecksum(file);
-                //metadata = ...
+                metadata = readMetadata(file);
 
                 dbFile.setLocation(location);
                 dbFile.setFilename(fname);
@@ -96,13 +105,23 @@ public class FileSystem {
             }
         } catch (IOException e) {
             // System.err.println("Error resolving canonical path: " + e.getMessage());
-        }
+        }               
 
         return dbFile;
     }
 
     public static long calculateChecksum(File file) {
-        return 0L;
+        CRC32 crc = new CRC32();
+        try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = bis.read(buffer)) != -1) {
+                crc.update(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            System.err.println("Error reading file: " + e.getMessage());
+        }
+        return crc.getValue();
     }
 
     public static String extractFilename(String filename) {
@@ -130,4 +149,31 @@ public class FileSystem {
 
         return String.format("%.2f %s", size, units[unitIndex]);
     }    
+
+    public static Set<String> readMetadata(File file) {
+        Set<String> metadataSet = new HashSet<>();
+
+        try {
+            Metadata metadata = ImageMetadataReader.readMetadata(file);
+            if (metadata != null) {
+                System.out.println("File is an image.");
+                for (Directory directory : metadata.getDirectories()) {
+                    for (Tag tag : directory.getTags()) {
+                        System.out.printf("%s - %s = %s%n", 
+                            directory.getName(), tag.getTagName(), tag.getDescription());
+                        System.out.println(tag);
+                        System.out.println("------------------------------");
+                    }
+                }
+            } else {
+                System.out.println("File is not an image.");
+            }
+        } catch (ImageProcessingException e) {
+            System.out.println("File is not an image.");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return metadataSet;
+    }   
 }
