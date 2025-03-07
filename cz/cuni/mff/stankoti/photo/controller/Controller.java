@@ -18,7 +18,7 @@ public class Controller {
         switch (db.getStatusCode()) {
             case StatusCode.NO_ERROR -> {} // do nothing
             case StatusCode.DB_FILE_DOES_NOT_EXIST,
-                StatusCode.DB_FILE_INCOMPATIBLE_FORMAT,
+                 StatusCode.DB_FILE_INCOMPATIBLE_FORMAT,
                  StatusCode.DB_FILE_READ_ERROR -> view.printStatus(db.getStatusCode());
             default -> view.printStatus(StatusCode.UNEXPECTED_STATUS);
         }

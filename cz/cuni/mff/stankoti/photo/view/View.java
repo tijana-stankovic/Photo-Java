@@ -38,6 +38,6 @@ public class View {
     }
         
     public void printStatus(StatusCode statusCode) {
-        System.out.println(StatusMessages.getStatusMessage(statusCode));
+        System.out.printf(StatusMessages.getStatusMessage(statusCode) + "%n");
     }
 }

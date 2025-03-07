@@ -1,11 +1,7 @@
 - Napravi list
-- Drugacije obradi exception situacije u writeDB
-- Pri snimanju, ako ne uspe da snimi, vraca kod greske, pa se ispisuje odgovarajuca poruka
-  (obraditi exceptione u WriteDB() i dopuniti logiku u save() u cmdinterpreter.java)
 - Pri ucitavanju, ako uspe ucitavanje, ispise informacije o nekim statistikama (npr. o broju fajlova u bazi i sl)
-- u exit() se za snimanje trenutno poziva direktno db.WriteDB(); a trebalo bi da se osloni na save()
-  ali save() ocekuje parametar, pa treba kako da se to uradi... mozda da se napravi overloading save() bez parametara...
 - prodji kroz sve komande koje imaju parametre i vidi sta nedostaje
+- napraviti save sa mogucnoscu dodavanja parametra (ime novog db fajla)
 
 
 =======================================================

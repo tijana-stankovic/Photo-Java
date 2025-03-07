@@ -52,7 +52,7 @@ public class CmdInterpreter {
             case "H", "HELP" -> help(cmd.args);
             case "AB", "ABOUT" -> about();
             case "E", "X", "EXIT" -> exit();
-            case "SAVE" -> save(cmd.args);
+            case "SAVE" -> save();
             case "A", "ADD" -> add(cmd.args);
             case "AK" -> addKeyword(cmd.args);
             case "R", "REMOVE" -> remove(cmd.args);
@@ -111,8 +111,10 @@ public class CmdInterpreter {
             char response = cli.askYesNo(view, "There are unsaved changes. Do you want to save them?", true);
             switch (response) {
                 case 'Y' -> {
-                    db.WriteDB();
-                    setQuitSignal(true);
+                    save();
+                    if (db.getStatusCode() == StatusCode.NO_ERROR) {
+                        setQuitSignal(true);
+                    }
                 }
                 case 'N' -> setQuitSignal(true);
                 case 'C' -> { }
@@ -123,10 +125,19 @@ public class CmdInterpreter {
         }
     }
 
-    private void save(String[] args) {
+    private void save() {
         if (db.isChanged()) {
             db.WriteDB();
-            view.print("Changes saved successfully.");
+
+            switch (db.getStatusCode()) {
+                case StatusCode.NO_ERROR -> view.print("Changes saved successfully.");
+                case StatusCode.DB_FILE_NOT_SERIALIZABLE,
+                     StatusCode.DB_FILE_WRITE_ERROR -> {
+                        view.printStatus(db.getStatusCode());
+                        assert db.getStatusCode() != StatusCode.DB_FILE_NOT_SERIALIZABLE;
+                     }
+                default -> view.printStatus(StatusCode.UNEXPECTED_STATUS);
+            }
         } else {
             view.print("There are no changes to save.");
         }

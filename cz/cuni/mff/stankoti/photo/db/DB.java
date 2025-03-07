@@ -7,6 +7,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidClassException;
+import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -68,8 +69,11 @@ public class DB {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(dbFilename))) {
             out.writeObject(data);
             dataSaved(true);
+        } catch (NotSerializableException e) {
+            setStatusCode(StatusCode.DB_FILE_NOT_SERIALIZABLE);
         } catch (IOException e) {
-            e.printStackTrace();
+            setStatusCode(StatusCode.DB_FILE_WRITE_ERROR);
+            //e.printStackTrace();
         }
     }
 

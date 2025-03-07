@@ -12,6 +12,7 @@ public class StatusMessages {
         statusMessages.put(StatusCode.DB_FILE_DOES_NOT_EXIST, "WARNING: The database file does not exist. A new file will be created.");
         statusMessages.put(StatusCode.DB_FILE_INCOMPATIBLE_FORMAT, "ERROR: The database file is in incompatible format.");
         statusMessages.put(StatusCode.DB_FILE_READ_ERROR, "ERROR: An error occurred while reading the database file.");
+        statusMessages.put(StatusCode.DB_FILE_NOT_SERIALIZABLE, "ERROR: Data object is not serializable.%nCheck: All data classes (DBData, DBFile, etc.) must implement the Serializable interface.");
         statusMessages.put(StatusCode.DB_FILE_WRITE_ERROR, "ERROR: An error occurred while writing to the database file.");
         statusMessages.put(StatusCode.INVALID_NUMBER_OF_ARGUMENTS, "ERROR: Invalid number of arguments.");
         statusMessages.put(StatusCode.PATH_DOES_NOT_EXIST, "ERROR: Path does not exists.");
