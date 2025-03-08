@@ -129,4 +129,17 @@ public class DB {
     public int nextFileID() {
         return data.nextFileID();
     }
+
+    public int getFileID(String location, String filename, String extension) {
+        return data.getFileID(location, filename, extension);
+    }
+
+    public void addKeyword(String keyword, int fileID) {
+        DBFile file = data.getFile(fileID);
+        if (file != null) {
+            file.addKeyword(keyword);
+            data.addFileKeyword(keyword, fileID);
+            dataChanged(true);
+        }
+    }
 }

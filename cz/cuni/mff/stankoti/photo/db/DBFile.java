@@ -135,12 +135,12 @@ public class DBFile implements Serializable {  // Implement the Serializable int
     public void addKeyword(String keyword) {
         assert keyword != null && !keyword.isEmpty() : "Keyword must be specified!";
         if (keyword != null) {
-            keywords.add(keyword);
+            keywords.add(keyword.toUpperCase());
         }
     }
 
     public void removeKeyword(String keyword) {
-        keywords.remove(keyword);
+        keywords.remove(keyword.toUpperCase());
     }
 
     public void addMetadata(MetadataInfo metadataInfo) {

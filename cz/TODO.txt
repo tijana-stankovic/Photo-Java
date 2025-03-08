@@ -1,5 +1,7 @@
+- podrzi multi-word parametre unutar ""
+- Napravi LIST
+- Napravi REMOVE i REMOVE KEYWORD komande
 - Obraditi preciznije Exception-e u FileSystem.java (u celom fajlu, ima na vise mesta)
-- Napravi list
 - Pri ucitavanju, ako uspe ucitavanje, ispise informacije o nekim statistikama (npr. o broju fajlova u bazi i sl)
 - prodji kroz sve komande koje imaju parametre i vidi sta nedostaje
 - napraviti save sa mogucnoscu dodavanja parametra (ime novog db fajla)

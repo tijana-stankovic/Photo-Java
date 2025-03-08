@@ -57,7 +57,11 @@ public class FileSystem {
         return listOfFiles;
     }
 
-    public static DBFile getFileInformation(String filename) {        
+    public static DBFile getFileInformation(String filename) {
+        return getFileInformation(filename, true);
+    }
+
+    public static DBFile getFileInformation(String filename, boolean full) {
         String location = "";
         String fname = "";
         String extension = "";
@@ -86,22 +90,25 @@ public class FileSystem {
                     fname = fullName;
                 }
 
-                // HH for 24-hour format, 
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss").withZone(ZoneId.systemDefault());  // Use system timezone
-                timestamp = formatter.format(Instant.ofEpochMilli(file.lastModified()));
-
-                size = file.length();
-                checksum = calculateChecksum(file);
-                metadata = readMetadata(file);
-
                 dbFile.setLocation(location);
                 dbFile.setFilename(fname);
                 dbFile.setExtension(extension);
-                dbFile.setTimestamp(timestamp);
-                dbFile.setSize(size);
-                dbFile.setChecksum(checksum);
-                dbFile.setKeywords(keywords);
-                dbFile.setMetadata(metadata);
+
+                if (full) {
+                    // HH for 24-hour format, 
+                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss").withZone(ZoneId.systemDefault());  // Use system timezone
+                    timestamp = formatter.format(Instant.ofEpochMilli(file.lastModified()));
+
+                    size = file.length();
+                    checksum = calculateChecksum(file);
+                    metadata = readMetadata(file);
+
+                    dbFile.setTimestamp(timestamp);
+                    dbFile.setSize(size);
+                    dbFile.setChecksum(checksum);
+                    dbFile.setKeywords(keywords);
+                    dbFile.setMetadata(metadata);
+                }
             }
         } catch (IOException e) {
             // System.err.println("Error resolving canonical path: " + e.getMessage());

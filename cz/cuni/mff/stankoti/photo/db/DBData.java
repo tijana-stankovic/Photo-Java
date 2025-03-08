@@ -144,15 +144,15 @@ public class DBData implements Serializable {  // Implement the Serializable int
     }
 
     public void addFileKeyword(String keyword, int fileID) {
-        keywords.computeIfAbsent(keyword, k -> new HashSet<>()).add(fileID);
+        keywords.computeIfAbsent(keyword.toUpperCase(), k -> new HashSet<>()).add(fileID);
     }
 
     public void removeFileKeyword(String keyword, int fileID) {
-        Set<Integer> fileIDs = keywords.get(keyword);
+        Set<Integer> fileIDs = keywords.get(keyword.toUpperCase());
         if (fileIDs != null) {
             fileIDs.remove(fileID);
             if (fileIDs.isEmpty()) {
-                keywords.remove(keyword);
+                keywords.remove(keyword.toUpperCase());
             }
         }
     }

@@ -49,6 +49,7 @@ public class CmdInterpreter {
         String command = cmd.command.toUpperCase();
 
         switch (command) {
+            case "" -> {} // do nothing
             case "H", "HELP" -> help(cmd.args);
             case "AB", "ABOUT" -> about();
             case "E", "X", "EXIT" -> exit();
@@ -209,8 +210,64 @@ public class CmdInterpreter {
             return;
         } 
 
-        view.print("Add keyword...");
-        System.out.println(args.length);    
+        String keyword = args[0].toUpperCase();
+        String directory = "";
+        String file = "";
+        String path = args[1];
+        switch(FileSystem.checkPath(path)) {
+            case 'F' -> file = path;
+            case 'D' -> directory = path;
+            case 'E' -> {
+                setStatusCode(StatusCode.PATH_DOES_NOT_EXIST);
+                view.printStatus(getStatusCode());
+                return;
+            }
+            default -> { assert false : "Unknown FileSystem.checkPath() result!"; }
+        }
+
+        view.print("Adding keyword '" + keyword + "' to ", false);
+        if (file != "") {
+            view.print( "file '" + file + "'");
+            addKeywordToFile(keyword, file, false);
+        } else {
+            view.print( "files in directory '" + directory + "'");
+            addKeywordToDirectory(keyword, directory);
+        }
+    }
+
+    private void addKeywordToFile(String keyword, String filename, boolean fullPath) {
+        String filenameOnly = filename;
+        if (fullPath) {
+            filenameOnly = FileSystem.extractFilename(filename);
+        }
+        view.print("Processing file '" + filenameOnly + "'... ", false );
+        DBFile file = FileSystem.getFileInformation(filename, false);
+        if (!file.getLocation().isEmpty()) {
+            int fileID = db.getFileID(file.getLocation(), file.getFilename(), file.getExtension());
+            if (fileID != 0) {
+                db.addKeyword(keyword, fileID);
+                view.print("Ok (fileID = " + fileID + ").");
+            } else {
+                view.print("Skipped (not found in database).");
+            }
+        } else {
+            view.print("Skipped.");
+        }
+    }
+
+    private void addKeywordToDirectory(String keyword, String directory) {
+        List<String> listOfFiles = FileSystem.filesInDirectory(directory);
+        if (listOfFiles.size() == 0) {
+            setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
+            view.printStatus(getStatusCode());    
+            return;
+        }
+
+        view.print("(found " + (listOfFiles.size() - 1) + " file(s))");
+        view.print("Full path: " + listOfFiles.get(0));
+        for (int i = 1; i < listOfFiles.size(); i++) {
+            addKeywordToFile(keyword, listOfFiles.get(i), true);
+        }
     }
 
     private void remove(String[] args) {
