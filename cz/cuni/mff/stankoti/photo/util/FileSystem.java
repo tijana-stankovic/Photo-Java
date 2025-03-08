@@ -65,7 +65,7 @@ public class FileSystem {
         long size = 0L;
         long checksum = 0L;
         Set<String> keywords = new HashSet<>();
-        Set<String> metadata = new HashSet<>();
+        Set<MetadataInfo> metadata = new HashSet<>();
 
         DBFile dbFile = new DBFile();
 
@@ -150,19 +150,15 @@ public class FileSystem {
         return String.format("%.2f %s", size, units[unitIndex]);
     }    
 
-    public static Set<String> readMetadata(File file) {
-        Set<String> metadataSet = new HashSet<>();
+    public static Set<MetadataInfo> readMetadata(File file) {
+        Set<MetadataInfo> metadataSet = new HashSet<>();
 
         try {
             Metadata metadata = ImageMetadataReader.readMetadata(file);
             if (metadata != null) {
-                System.out.println("File is an image.");
                 for (Directory directory : metadata.getDirectories()) {
                     for (Tag tag : directory.getTags()) {
-                        System.out.printf("%s - %s = %s%n", 
-                            directory.getName(), tag.getTagName(), tag.getDescription());
-                        System.out.println(tag);
-                        System.out.println("------------------------------");
+                        metadataSet.add(new MetadataInfo(directory.getName(), tag.getTagName(), tag.getDescription()));
                     }
                 }
             } else {

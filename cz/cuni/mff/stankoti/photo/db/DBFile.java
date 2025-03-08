@@ -1,5 +1,7 @@
 package cz.cuni.mff.stankoti.photo.db;
 
+import cz.cuni.mff.stankoti.photo.util.MetadataInfo;
+
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,7 +16,7 @@ public class DBFile implements Serializable {  // Implement the Serializable int
     private long size;
     private long checksum;
     private Set<String> keywords;
-    private Set<String> metadata;    
+    private Set<MetadataInfo> metadata;
 
     // This constructor is required for deserialization
     public DBFile() {
@@ -32,7 +34,7 @@ public class DBFile implements Serializable {  // Implement the Serializable int
     public DBFile(int id, 
                 String location, String filename, String extension, 
                 String timestamp, long size, long checksum, 
-                Set<String> keywords, Set<String> metadata) {
+                Set<String> keywords, Set<MetadataInfo> metadata) {
         setID(id);
         setLocation(location);
         setFilename(filename);
@@ -118,11 +120,11 @@ public class DBFile implements Serializable {  // Implement the Serializable int
         }
     }
 
-    public Set<String> getMetadata() {
+    public Set<MetadataInfo> getMetadata() {
         return metadata;
     }
 
-    public void setMetadata(Set<String> metadata) {
+    public void setMetadata(Set<MetadataInfo> metadata) {
         if (metadata == null) {
             this.metadata = new HashSet<>();
         } else {
@@ -141,14 +143,14 @@ public class DBFile implements Serializable {  // Implement the Serializable int
         keywords.remove(keyword);
     }
 
-    public void addMetadata(String metadataString) {
-        assert metadataString != null && !metadataString.isEmpty() : "Metadata must be specified!";
-        if (metadataString != null) {
-            metadata.add(metadataString);
+    public void addMetadata(MetadataInfo metadataInfo) {
+        assert metadataInfo != null : "Metadata must be specified!";
+        if (metadata != null) {
+            metadata.add(metadataInfo);
         }
     }
 
-    public void removeMetadata(String metadataString) {
-        metadata.remove(metadataString);
-    }    
+    public void removeMetadata(MetadataInfo metadataInfo) {
+        metadata.remove(metadataInfo);
+    }
 }

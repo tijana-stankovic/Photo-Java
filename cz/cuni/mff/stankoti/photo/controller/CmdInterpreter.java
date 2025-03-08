@@ -165,36 +165,6 @@ public class CmdInterpreter {
             }
             default -> { assert false : "Unknown FileSystem.checkPath() result!"; }
         }
-
-        // int fileID = db.nextFileID();
-        // if (db.addFile(new DBFile(fileID, 
-        //             "/path/to/file1", 
-        //             "file1.txt", 
-        //             ".txt", 
-        //             "2025-02-21", 
-        //             1024, 
-        //             123456789L, 
-        //             new HashSet<>(Arrays.asList("example1", "document1")), 
-        //             new HashSet<>(Arrays.asList("metadata1-1", "metadata1-2")))) == 0) {
-        //     view.print("New file is added.");
-        // } else {
-        //     view.print("File is updated.");
-        // }
-
-        // fileID = db.nextFileID();
-        // if (db.addFile(new DBFile(fileID,
-        //             "/path/to/file2", 
-        //             "file2.txt", 
-        //             ".txt", 
-        //             "2025-02-22", 
-        //             1025, 
-        //             123456790L, 
-        //             new HashSet<>(Arrays.asList("example2", "document2")), 
-        //             new HashSet<>(Arrays.asList("metadata2-1", "metadata2-2")))) == 0) {
-        //     view.print("New file is added.");
-        // } else {
-        //     view.print("File is updated.");
-        // }
     }
 
     private void addFile(String filename, boolean fullPath) {

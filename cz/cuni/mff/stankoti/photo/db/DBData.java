@@ -17,7 +17,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     private Map<Long, Set<Integer>> sizes;
     private Map<Long, Set<Integer>> checksums;
     private Map<String, Set<Integer>> keywords;
-    private Map<String, Set<Integer>> metadata;
+    private Map<String, Set<Integer>> metadataTags;
 
     public DBData() {
         lastFileID = 0;
@@ -29,7 +29,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
         sizes = new HashMap<>();
         checksums = new HashMap<>();
         keywords = new HashMap<>();
-        metadata = new HashMap<>();
+        metadataTags = new HashMap<>();
     }
 
     public int getLastFileID() {
@@ -157,16 +157,16 @@ public class DBData implements Serializable {  // Implement the Serializable int
         }
     }
 
-    public void addFileMetadata(String metadataString, int fileID) {
-        metadata.computeIfAbsent(metadataString, k -> new HashSet<>()).add(fileID);
+    public void addFileMetadataTag(String metadataTag, int fileID) {
+        metadataTags.computeIfAbsent(metadataTag, k -> new HashSet<>()).add(fileID);
     }
 
-    public void removeFileMetadata(String metadataString, int fileID) {
-        Set<Integer> fileIDs = metadata.get(metadataString);
+    public void removeFileMetadataTag(String metadataTag, int fileID) {
+        Set<Integer> fileIDs = metadataTags.get(metadataTag);
         if (fileIDs != null) {
             fileIDs.remove(fileID);
             if (fileIDs.isEmpty()) {
-                metadata.remove(metadataString);
+                metadataTags.remove(metadataTag);
             }
         }
     }

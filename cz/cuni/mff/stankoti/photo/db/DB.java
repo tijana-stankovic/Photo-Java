@@ -1,6 +1,7 @@
 package cz.cuni.mff.stankoti.photo.db;
 
 import cz.cuni.mff.stankoti.photo.status.StatusCode;
+import cz.cuni.mff.stankoti.photo.util.MetadataInfo;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -55,6 +56,7 @@ public class DB {
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(dbFilename))) {
             data = (DBData) in.readObject();
             dataChanged(false);
+            setStatusCode(StatusCode.NO_ERROR);
         } catch (FileNotFoundException e) { // File not found
             setStatusCode(StatusCode.DB_FILE_DOES_NOT_EXIST);
         } catch (ClassNotFoundException | InvalidClassException e ) { // Class not found or Class version mismatch
@@ -69,6 +71,7 @@ public class DB {
         try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(dbFilename))) {
             out.writeObject(data);
             dataSaved(true);
+            setStatusCode(StatusCode.NO_ERROR);
         } catch (NotSerializableException e) {
             setStatusCode(StatusCode.DB_FILE_NOT_SERIALIZABLE);
         } catch (IOException e) {
@@ -95,8 +98,8 @@ public class DB {
         for (String keyword : file.getKeywords()) {
             data.addFileKeyword(keyword, fileID);
         }
-        for (String metadataString : file.getMetadata()) {
-            data.addFileMetadata(metadataString, fileID);
+        for (MetadataInfo metadataInfo : file.getMetadata()) {
+            data.addFileMetadataTag(metadataInfo.getTag(), fileID);
         }
     
         dataChanged(true);
@@ -116,8 +119,8 @@ public class DB {
         for (String keyword : file.getKeywords()) {
             data.removeFileKeyword(keyword, fileID);
         }
-        for (String metadataString : file.getMetadata()) {
-            data.removeFileMetadata(metadataString, fileID);
+        for (MetadataInfo metadataInfo : file.getMetadata()) {
+            data.removeFileMetadataTag(metadataInfo.getTag(), fileID);
         }
 
         dataChanged(true);
