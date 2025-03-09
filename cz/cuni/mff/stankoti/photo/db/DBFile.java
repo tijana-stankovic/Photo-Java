@@ -9,6 +9,7 @@ import java.util.Set;
 public class DBFile implements Serializable {  // Implement the Serializable interface
     private static final long serialVersionUID = 1L;
     private int id;
+    private String fullpath;
     private String location;
     private String filename;
     private String extension;
@@ -21,6 +22,7 @@ public class DBFile implements Serializable {  // Implement the Serializable int
     // This constructor is required for deserialization
     public DBFile() {
         id = 0;
+        fullpath = "";
         location = "";
         filename = "";
         extension = "";
@@ -32,10 +34,11 @@ public class DBFile implements Serializable {  // Implement the Serializable int
     }
 
     public DBFile(int id, 
-                String location, String filename, String extension, 
+                String fullpath, String location, String filename, String extension, 
                 String timestamp, long size, long checksum, 
                 Set<String> keywords, Set<MetadataInfo> metadata) {
         setID(id);
+        setFullpath(fullpath);
         setLocation(location);
         setFilename(filename);
         setExtension(extension);
@@ -53,6 +56,15 @@ public class DBFile implements Serializable {  // Implement the Serializable int
     public void setID(int id) {
         assert id > 0 : "File ID must be positive!";
         this.id = id;
+    }
+
+    public String getFullpath() {
+        return fullpath;
+    }
+
+    public void setFullpath(String fullpath) {
+        assert fullpath != null && !fullpath.isEmpty() : "File path must be specified!";
+        this.fullpath = fullpath;
     }
 
     public String getLocation() {
@@ -134,9 +146,7 @@ public class DBFile implements Serializable {  // Implement the Serializable int
 
     public void addKeyword(String keyword) {
         assert keyword != null && !keyword.isEmpty() : "Keyword must be specified!";
-        if (keyword != null) {
-            keywords.add(keyword.toUpperCase());
-        }
+        keywords.add(keyword.toUpperCase());
     }
 
     public void removeKeyword(String keyword) {
@@ -145,9 +155,7 @@ public class DBFile implements Serializable {  // Implement the Serializable int
 
     public void addMetadata(MetadataInfo metadataInfo) {
         assert metadataInfo != null : "Metadata must be specified!";
-        if (metadata != null) {
-            metadata.add(metadataInfo);
-        }
+        metadata.add(metadataInfo);
     }
 
     public void removeMetadata(MetadataInfo metadataInfo) {

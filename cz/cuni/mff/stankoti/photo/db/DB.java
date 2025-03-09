@@ -81,7 +81,8 @@ public class DB {
     }
 
     public int addFile(DBFile file) {
-        int oldFileID = data.getFileID(file.getLocation(), file.getFilename(), file.getExtension());
+        //int oldFileID = data.getFileID(file.getLocation(), file.getFilename(), file.getExtension());
+        int oldFileID = data.getFileID(file.getFullpath());
 
         if (oldFileID != 0) {
             removeFile(oldFileID);
@@ -89,6 +90,7 @@ public class DB {
 
         data.addFile(file);
         int fileID = file.getID();
+        data.addFilePath(file.getFullpath(), fileID);
         data.addFileLocation(file.getLocation(), fileID);
         data.addFileFilename(file.getFilename(), fileID);
         data.addFileExtension(file.getExtension(), fileID);
@@ -110,6 +112,7 @@ public class DB {
     public void removeFile(int fileID) {
         DBFile file = data.getFile(fileID);
         data.removeFile(fileID);
+        data.removeFilePath(file.getFullpath(), fileID);
         data.removeFileLocation(file.getLocation(), fileID);
         data.removeFileFilename(file.getFilename(), fileID);
         data.removeFileExtension(file.getExtension(), fileID);
@@ -128,6 +131,10 @@ public class DB {
 
     public int nextFileID() {
         return data.nextFileID();
+    }
+
+    public int getFileID(String fullpath) {
+        return data.getFileID(fullpath);
     }
 
     public int getFileID(String location, String filename, String extension) {

@@ -61,7 +61,8 @@ public class FileSystem {
         return getFileInformation(filename, true);
     }
 
-    public static DBFile getFileInformation(String filename, boolean full) {
+    public static DBFile getFileInformation(String filename, boolean fullInfo) {
+        String fullpath = "";
         String location = "";
         String fname = "";
         String extension = "";
@@ -76,6 +77,8 @@ public class FileSystem {
         try {
             File file = new File(filename);
             if (file.isFile()) {
+                fullpath = file.getCanonicalPath(); // full filepath
+
                 String parentPath = file.getParent(); // Absolute parent path
                 location = parentPath != null ? new File(parentPath).getCanonicalPath() : "";
 
@@ -90,11 +93,12 @@ public class FileSystem {
                     fname = fullName;
                 }
 
+                dbFile.setFullpath(fullpath);
                 dbFile.setLocation(location);
                 dbFile.setFilename(fname);
                 dbFile.setExtension(extension);
 
-                if (full) {
+                if (fullInfo) {
                     // HH for 24-hour format, 
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss").withZone(ZoneId.systemDefault());  // Use system timezone
                     timestamp = formatter.format(Instant.ofEpochMilli(file.lastModified()));

@@ -10,6 +10,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     private static final long serialVersionUID = 1L;
     private int lastFileID;
     private Map<Integer, DBFile> files;
+    private Map<String, Integer> fullpaths;
     private Map<String, Set<Integer>> locations;
     private Map<String, Set<Integer>> filenames;
     private Map<String, Set<Integer>> extensions;
@@ -22,6 +23,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     public DBData() {
         lastFileID = 0;
         files = new HashMap<>();
+        fullpaths = new HashMap<>();
         locations = new HashMap<>();
         filenames = new HashMap<>();
         extensions = new HashMap<>();
@@ -54,12 +56,20 @@ public class DBData implements Serializable {  // Implement the Serializable int
     }
 
     public void removeFile(int fileID) {
-        if (files.containsKey(fileID)) {
-            files.remove(fileID);
-        }
+        files.remove(fileID);
+    }
+
+    public void addFilePath(String fullpath, int fileID) {
+        assert fullpath != null && !fullpath.isEmpty() : "Path must be specified!";
+        fullpaths.put(fullpath, fileID);
+    }
+
+    public void removeFilePath(String fullpath, int fileID) {
+        fullpaths.remove(fullpath);
     }
 
     public void addFileLocation(String location, int fileID) {
+        assert location != null && !location.isEmpty() : "File location must be specified!";
         locations.computeIfAbsent(location, k -> new HashSet<>()).add(fileID);
     }
 
@@ -74,6 +84,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     }
 
     public void addFileFilename(String filename, int fileID) {
+        assert filename != null && !filename.isEmpty() : "Filename must be specified!";
         filenames.computeIfAbsent(filename, k -> new HashSet<>()).add(fileID);
     }
 
@@ -88,6 +99,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     }
 
     public void addFileExtension(String extension, int fileID) {
+        assert extension != null && !extension.isEmpty() : "File extension must be specified!";
         extensions.computeIfAbsent(extension, k -> new HashSet<>()).add(fileID);
     }
 
@@ -102,6 +114,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     }
 
     public void addFileTimestamp(String timestamp, int fileID) {
+        assert timestamp != null && !timestamp.isEmpty() : "File timestamp must be specified!";
         timestamps.computeIfAbsent(timestamp, k -> new HashSet<>()).add(fileID);
     }
 
@@ -116,6 +129,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     }
 
     public void addFileSize(long size, int fileID) {
+        assert size >= 0 : "Size must not be negative!";
         sizes.computeIfAbsent(size, k -> new HashSet<>()).add(fileID);
     }
 
@@ -144,6 +158,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     }
 
     public void addFileKeyword(String keyword, int fileID) {
+        assert keyword != null && !keyword.isEmpty() : "Keyword must be specified!";
         keywords.computeIfAbsent(keyword.toUpperCase(), k -> new HashSet<>()).add(fileID);
     }
 
@@ -158,6 +173,7 @@ public class DBData implements Serializable {  // Implement the Serializable int
     }
 
     public void addFileMetadataTag(String metadataTag, int fileID) {
+        assert metadataTag != null && !metadataTag.isEmpty() : "Metadata tag must be specified!";
         metadataTags.computeIfAbsent(metadataTag, k -> new HashSet<>()).add(fileID);
     }
 
@@ -169,6 +185,14 @@ public class DBData implements Serializable {  // Implement the Serializable int
                 metadataTags.remove(metadataTag);
             }
         }
+    }
+
+    public int getFileID(String fullpath) {
+        Integer fileID = fullpaths.get(fullpath);
+        if (fileID == null) {
+            fileID = 0;
+        }
+        return fileID;
     }
 
     // Method to get the file ID which exists in all three sets

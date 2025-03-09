@@ -243,7 +243,8 @@ public class CmdInterpreter {
         view.print("Processing file '" + filenameOnly + "'... ", false );
         DBFile file = FileSystem.getFileInformation(filename, false);
         if (!file.getLocation().isEmpty()) {
-            int fileID = db.getFileID(file.getLocation(), file.getFilename(), file.getExtension());
+            // int fileID = db.getFileID(file.getLocation(), file.getFilename(), file.getExtension());
+            int fileID = db.getFileID(file.getFullpath());
             if (fileID != 0) {
                 db.addKeyword(keyword, fileID);
                 view.print("Ok (fileID = " + fileID + ").");

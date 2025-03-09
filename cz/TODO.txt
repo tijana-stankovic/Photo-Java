@@ -1,3 +1,8 @@
+- Prepravi add keyword da radi sa bazom 
+   prvo pretrazuje da li postoji datoteka sa navedenim imenom, pa ako da, nju obradi 
+       (ocigledno, u tom slucaju ne moze da postoji folder sa tim imenom)
+   ako ne postoji onda pokusava sa takvim folderom 
+   ako ni to ne postoji, javi path (ili "file/folder does not exist")
 - Napravi LIST
 - Napravi REMOVE i REMOVE KEYWORD komande
 - Obraditi preciznije Exception-e u FileSystem.java (u celom fajlu, ima na vise mesta)
