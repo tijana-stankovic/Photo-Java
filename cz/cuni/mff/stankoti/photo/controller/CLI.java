@@ -15,39 +15,63 @@ public class CLI implements AutoCloseable {
     }
 
     public Command readCommand() {
-        String cmd = "";
         ArrayList<String> argList = new ArrayList<>();
-
+    
         try {
             // Read data from standard input
             String line = input.readLine();
             if (line != null) {
-                // Split the line into words using whitespace as the delimiter
-                String[] words = line.split("\\s+");
-                for (String word : words) {
-                    // Skip empty elements
-                    if (word.isEmpty()) {
-                        continue;
-                    }
-                    if (cmd.isEmpty()) {
-                        cmd = word;
+                StringBuilder currentWord = new StringBuilder();
+                boolean insideQuotes = false;
+
+                for (int i = 0; i < line.length(); i++) {
+                    char c = line.charAt(i);
+
+                    if (c == '"') {
+                        if (!insideQuotes) {
+                            insideQuotes = true;
+                        } else {
+                            insideQuotes = false;
+                            // Closing quote, add the quoted parameter
+                            argList.add(currentWord.toString());
+                            currentWord.setLength(0);
+                        }
+                    } else if (Character.isWhitespace(c) && !insideQuotes) {
+                        if (currentWord.length() > 0) {
+                            argList.add(currentWord.toString());
+                            currentWord.setLength(0);
+                        }
                     } else {
-                        argList.add(word);
+                        currentWord.append(c);
                     }
+                }
+
+                // If there is no closing quote, add the last word
+                if (currentWord.length() > 0) {
+                    argList.add(currentWord.toString());
                 }
             }
         } catch (IOException e) {
             System.err.println("IOException occurred");
         }
 
-        String[] cmdArgs = new String[argList.size()];
-        for (int i = 0; i < argList.size(); i++) {
-            cmdArgs[i] = argList.get(i);
+        String cmd;
+        String[] cmdArgs;
+        if (argList.size() > 0) {
+            cmd = argList.get(0);
+            cmdArgs = new String[argList.size() - 1];
+            for (int i = 1; i < argList.size(); i++) {
+                cmdArgs[i - 1] = argList.get(i);
+            }
+        } else {
+            cmd = "";
+            cmdArgs = new String[0];
         }
+
         Command command = new Command(cmd, cmdArgs);
         return command;
     }
-
+    
     public char askYesNo(View view, String message, boolean cancel) {
         String prompt = cancel ? " (Yes/No/Cancel)" : " (Yes/No)";
         String response;

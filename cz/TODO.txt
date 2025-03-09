@@ -1,4 +1,3 @@
-- podrzi multi-word parametre unutar ""
 - Napravi LIST
 - Napravi REMOVE i REMOVE KEYWORD komande
 - Obraditi preciznije Exception-e u FileSystem.java (u celom fajlu, ima na vise mesta)
