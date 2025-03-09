@@ -10,6 +10,7 @@ public class StatusMessages {
         statusMessages.put(StatusCode.UNEXPECTED_STATUS, "WARNING: Unexpected program status.");
         statusMessages.put(StatusCode.UNKNOWN_COMMAND, "ERROR: Unknown command. Use Help or H for a list of available commands.");
         statusMessages.put(StatusCode.DB_FILE_DOES_NOT_EXIST, "WARNING: The database file does not exist. A new file will be created.");
+        statusMessages.put(StatusCode.DB_PATH_DOES_NOT_EXIST, "ERROR: Path does not exists in the database.");
         statusMessages.put(StatusCode.DB_FILE_INCOMPATIBLE_FORMAT, "ERROR: The database file is in incompatible format.");
         statusMessages.put(StatusCode.DB_FILE_READ_ERROR, "ERROR: An error occurred while reading the database file.");
         statusMessages.put(StatusCode.DB_FILE_NOT_SERIALIZABLE, "ERROR: Data object is not serializable.%nCheck: All data classes (DBData, DBFile, etc.) must implement the Serializable interface.");

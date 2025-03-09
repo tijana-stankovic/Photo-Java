@@ -7,6 +7,7 @@ import cz.cuni.mff.stankoti.photo.util.FileSystem;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 public class CmdInterpreter {
     private DB db;
@@ -211,64 +212,32 @@ public class CmdInterpreter {
         } 
 
         String keyword = args[0].toUpperCase();
-        String directory = "";
-        String file = "";
         String path = args[1];
-        switch(FileSystem.checkPath(path)) {
-            case 'F' -> file = path;
-            case 'D' -> directory = path;
-            case 'E' -> {
-                setStatusCode(StatusCode.PATH_DOES_NOT_EXIST);
-                view.printStatus(getStatusCode());
-                return;
-            }
-            default -> { assert false : "Unknown FileSystem.checkPath() result!"; }
-        }
 
-        view.print("Adding keyword '" + keyword + "' to ", false);
-        if (file != "") {
-            view.print( "file '" + file + "'");
-            addKeywordToFile(keyword, file, false);
+        int fileID = db.getFileID(path);
+        if (fileID != 0) {
+            view.print("Adding the keyword '" + keyword + "' to the specified file.");
+            addKeywordToFile(keyword, fileID);
         } else {
-            view.print( "files in directory '" + directory + "'");
-            addKeywordToDirectory(keyword, directory);
-        }
-    }
-
-    private void addKeywordToFile(String keyword, String filename, boolean fullPath) {
-        String filenameOnly = filename;
-        if (fullPath) {
-            filenameOnly = FileSystem.extractFilename(filename);
-        }
-        view.print("Processing file '" + filenameOnly + "'... ", false );
-        DBFile file = FileSystem.getFileInformation(filename, false);
-        if (!file.getLocation().isEmpty()) {
-            // int fileID = db.getFileID(file.getLocation(), file.getFilename(), file.getExtension());
-            int fileID = db.getFileID(file.getFullpath());
-            if (fileID != 0) {
-                db.addKeyword(keyword, fileID);
-                view.print("Ok (fileID = " + fileID + ").");
+            Set<Integer> fileIDs = db.getFileIDsInLocation(path);
+            if (fileIDs != null) {
+                view.print("Adding the keyword '" + keyword + "' to files in the specified directory.");
+                view.print("(found " + fileIDs.size() + " file(s))");
+                for (Integer fileId : fileIDs) {
+                    addKeywordToFile(keyword, fileId);
+                }
             } else {
-                view.print("Skipped (not found in database).");
+                setStatusCode(StatusCode.DB_PATH_DOES_NOT_EXIST);
+                view.printStatus(getStatusCode());
             }
-        } else {
-            view.print("Skipped.");
-        }
+        } 
     }
 
-    private void addKeywordToDirectory(String keyword, String directory) {
-        List<String> listOfFiles = FileSystem.filesInDirectory(directory);
-        if (listOfFiles.size() == 0) {
-            setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
-            view.printStatus(getStatusCode());    
-            return;
-        }
-
-        view.print("(found " + (listOfFiles.size() - 1) + " file(s))");
-        view.print("Full path: " + listOfFiles.get(0));
-        for (int i = 1; i < listOfFiles.size(); i++) {
-            addKeywordToFile(keyword, listOfFiles.get(i), true);
-        }
+    private void addKeywordToFile(String keyword, int fileID) {
+        DBFile file = db.getFile(fileID);
+        view.print("Processing file '" + file.getFilename() + "." + file.getExtension() + "'... ", false );
+        db.addKeyword(keyword, fileID);
+        view.print("Ok (fileID = " + fileID + ").");
     }
 
     private void remove(String[] args) {

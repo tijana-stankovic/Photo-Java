@@ -11,6 +11,7 @@ import java.io.InvalidClassException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Set;
 
 public class DB {
     public static final String DEFAULT_DB_FILENAME = "photo_db.pdb";
@@ -139,6 +140,14 @@ public class DB {
 
     public int getFileID(String location, String filename, String extension) {
         return data.getFileID(location, filename, extension);
+    }
+
+    public DBFile getFile(int fileID) {
+        return data.getFile(fileID);
+    }
+
+    public Set<Integer> getFileIDsInLocation(String location) {
+        return data.getFileIDsInLocation(location);
     }
 
     public void addKeyword(String keyword, int fileID) {

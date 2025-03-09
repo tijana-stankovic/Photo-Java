@@ -208,4 +208,9 @@ public class DBData implements Serializable {  // Implement the Serializable int
         }
         return 0;
     }
+
+    public Set<Integer> getFileIDsInLocation(String location) {
+        Set<Integer> fileIDs = locations.get(location);
+        return fileIDs;
+    }
 }
