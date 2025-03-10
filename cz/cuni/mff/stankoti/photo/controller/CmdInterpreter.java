@@ -251,6 +251,10 @@ public class CmdInterpreter {
     }
 
     private void list(String[] args) {
+        list(args, false);
+    }
+
+    private void list(String[] args, Boolean allDetails) {
         if (args.length != 1) {
             setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
             view.printStatus(getStatusCode());
@@ -261,19 +265,31 @@ public class CmdInterpreter {
         Character detailsLevel = ' ';
         Set<Integer> fileIDs = db.getFileIDs(path, 'F');
         if (fileIDs != null) {
-            detailsLevel = 'F'; // print file info only
+            if (allDetails) {
+                detailsLevel = 'A'; // print all details
+            } else {
+                detailsLevel = 'F'; // print file info only
+            } 
             view.print("The specified file exists in the database.");
         } else {
             fileIDs = db.getFileIDs(path, 'D');
             if (fileIDs != null) {
-                detailsLevel = 'F'; // print file info only
+                if (allDetails) {
+                    detailsLevel = 'A'; // print all details
+                } else {
+                    detailsLevel = 'F'; // print file info only
+                }
                 view.print("The specified directory exists in the database.");
                 view.print("(found " + fileIDs.size() + " file(s))");
             } else {
                 String keyword = args[0].toUpperCase();
                 fileIDs = db.getFileIDs(keyword, 'K');
                 if (fileIDs != null) {
-                    detailsLevel = 'D'; // print file info + directory name
+                    if (allDetails) {
+                        detailsLevel = 'A'; // print all details
+                    } else {
+                       detailsLevel = 'D'; // print file info + directory name
+                    }
                     view.print("The specified keyword exists in the database.");
                     view.print("(found " + fileIDs.size() + " file(s))");
                 }    
@@ -311,8 +327,21 @@ public class CmdInterpreter {
             }
         } else if (detailsLevel == 'A') { // All info
             view.print(filenameWithExtension);
-            view.print("   in: " + file.getLocation());
-            view.print("OTHER details......");
+            String prefix = "   ";
+            view.print(prefix + "in: " + file.getLocation());
+            view.print(prefix + "ID: " + file.getID());
+            view.print(prefix + "Timestamp: " + formattedTimestamp);
+            view.print(prefix + "Size: " + fileSize + " (" + file.getSize() + "byte(s))");
+            view.print(prefix + "CRC32: " + file.getChecksum());
+            view.print(prefix + "Keywords: ", false);
+            for (String keyword : file.getKeywords()) {
+                view.print(keyword + " ", false);
+            }
+            view.print("");
+            view.print(prefix + "Metadata:");
+            for (var metadataTag : file.getMetadata()) {
+                view.print(prefix + prefix + metadataTag.getDirectory() + " " + metadataTag.getTag() + " " + metadataTag.getDescription());
+            }
             view.print("------------------------------------------------------");
         } 
     }
@@ -329,7 +358,7 @@ public class CmdInterpreter {
     }
 
     private void details(String[] args) {
-        view.print("Details...");
+        list(args, true);
     }
 
     private void duplicates(String[] args) {
