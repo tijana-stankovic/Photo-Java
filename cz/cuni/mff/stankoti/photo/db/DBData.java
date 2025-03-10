@@ -213,4 +213,9 @@ public class DBData implements Serializable {  // Implement the Serializable int
         Set<Integer> fileIDs = locations.get(location);
         return fileIDs;
     }
+
+    public Set<Integer> getFileIDsWithKeyword(String keyword) {
+        Set<Integer> fileIDs = keywords.get(keyword);
+        return fileIDs;
+    }
 }

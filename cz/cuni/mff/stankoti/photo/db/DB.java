@@ -11,6 +11,7 @@ import java.io.InvalidClassException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashSet;
 import java.util.Set;
 
 public class DB {
@@ -146,8 +147,21 @@ public class DB {
         return data.getFile(fileID);
     }
 
-    public Set<Integer> getFileIDsInLocation(String location) {
-        return data.getFileIDsInLocation(location);
+    public Set<Integer> getFileIDs(String key, char where) {
+        Set<Integer> fileIDs = null;
+        switch (Character.toUpperCase(where)) {
+            case 'F' -> {
+                int fileID = data.getFileID(key);
+                if (fileID != 0) {
+                    fileIDs = new HashSet<>();
+                    fileIDs.add(fileID);
+                }
+            }
+            case 'D' -> fileIDs = data.getFileIDsInLocation(key);
+            case 'K' -> fileIDs = data.getFileIDsWithKeyword(key);
+            default -> { assert false : "Method DB.getFileIDs() - Invalid 'where' parameter value!"; }
+        }
+        return fileIDs;
     }
 
     public void addKeyword(String keyword, int fileID) {

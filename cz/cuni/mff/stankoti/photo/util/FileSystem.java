@@ -99,7 +99,7 @@ public class FileSystem {
                 dbFile.setExtension(extension);
 
                 if (fullInfo) {
-                    // HH for 24-hour format, 
+                    // HH for 24-hour format
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss").withZone(ZoneId.systemDefault());  // Use system timezone
                     timestamp = formatter.format(Instant.ofEpochMilli(file.lastModified()));
 

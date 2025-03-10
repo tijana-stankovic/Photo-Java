@@ -214,22 +214,24 @@ public class CmdInterpreter {
         String keyword = args[0].toUpperCase();
         String path = args[1];
 
-        int fileID = db.getFileID(path);
-        if (fileID != 0) {
+        Set<Integer> fileIDs = db.getFileIDs(path, 'F');
+        if (fileIDs != null) {
             view.print("Adding the keyword '" + keyword + "' to the specified file.");
-            addKeywordToFile(keyword, fileID);
         } else {
-            Set<Integer> fileIDs = db.getFileIDsInLocation(path);
+            fileIDs = db.getFileIDs(path, 'D');
             if (fileIDs != null) {
                 view.print("Adding the keyword '" + keyword + "' to files in the specified directory.");
                 view.print("(found " + fileIDs.size() + " file(s))");
-                for (Integer fileId : fileIDs) {
-                    addKeywordToFile(keyword, fileId);
-                }
-            } else {
-                setStatusCode(StatusCode.DB_PATH_DOES_NOT_EXIST);
-                view.printStatus(getStatusCode());
             }
+        }
+
+        if (fileIDs != null) {
+            for (Integer fileId : fileIDs) {
+                addKeywordToFile(keyword, fileId);
+            }
+        } else {
+            setStatusCode(StatusCode.DB_FILE_DIR_DOES_NOT_EXIST);
+            view.printStatus(getStatusCode());
         } 
     }
 
@@ -249,7 +251,81 @@ public class CmdInterpreter {
     }
 
     private void list(String[] args) {
-        view.print("List...");
+        if (args.length != 1) {
+            setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
+            view.printStatus(getStatusCode());
+            return;
+        } 
+
+        String path = args[0];
+        Character detailsLevel = ' ';
+        Set<Integer> fileIDs = db.getFileIDs(path, 'F');
+        if (fileIDs != null) {
+            detailsLevel = 'F'; // print file info only
+            view.print("The specified file exists in the database.");
+        } else {
+            fileIDs = db.getFileIDs(path, 'D');
+            if (fileIDs != null) {
+                detailsLevel = 'F'; // print file info only
+                view.print("The specified directory exists in the database.");
+                view.print("(found " + fileIDs.size() + " file(s))");
+            } else {
+                String keyword = args[0].toUpperCase();
+                fileIDs = db.getFileIDs(keyword, 'K');
+                if (fileIDs != null) {
+                    detailsLevel = 'D'; // print file info + directory name
+                    view.print("The specified keyword exists in the database.");
+                    view.print("(found " + fileIDs.size() + " file(s))");
+                }    
+            }
+        }
+
+        if (fileIDs != null) {
+            for (Integer fileId : fileIDs) {
+                listFileInfo(fileId, detailsLevel);
+            }
+        } else {
+            setStatusCode(StatusCode.DB_FILE_DIR_KEYWORD_DOES_NOT_EXIST);
+            view.printStatus(getStatusCode());
+        } 
+    }
+
+    private void listFileInfo(int fileID, Character detailsLevel) {
+        DBFile file = db.getFile(fileID);
+
+        String filenameWithExtension = file.getFilename() + "." + file.getExtension();
+        String formattedTimestamp = formatedDateTime(file.getTimestamp());
+        String fileSize = FileSystem.formatFileSize(file.getSize());
+        String formattedOutput;
+
+        if (detailsLevel == 'F' || detailsLevel == 'D' ) { // File info or Directory info
+            if (filenameWithExtension.length() + fileSize.length() + 3 <= 60) {
+                formattedOutput = String.format("%-60s   %s   %s", filenameWithExtension, formattedTimestamp, fileSize);
+            } else {
+                formattedOutput = filenameWithExtension + "   " + formattedTimestamp + "   " + fileSize;
+            }
+            view.print(formattedOutput);
+
+            if (detailsLevel == 'D') { // Directory info
+                view.print("   in: " + file.getLocation());
+            }
+        } else if (detailsLevel == 'A') { // All info
+            view.print(filenameWithExtension);
+            view.print("   in: " + file.getLocation());
+            view.print("OTHER details......");
+            view.print("------------------------------------------------------");
+        } 
+    }
+
+    private String formatedDateTime(String dateTime) {
+        String year = dateTime.substring(0, 4);
+        String month = dateTime.substring(4, 6);
+        String day = dateTime.substring(6, 8);
+        String hour = dateTime.substring(9, 11);
+        String minute = dateTime.substring(11, 13);
+        String second = dateTime.substring(13, 15);
+        String formattedDateTime = day + "." + month + "." + year + " " + hour + ":" + minute + ":" + second;
+        return formattedDateTime;
     }
 
     private void details(String[] args) {

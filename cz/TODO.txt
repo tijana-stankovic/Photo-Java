@@ -1,4 +1,4 @@
-- Napravi LIST
+- Napravi DETAILS
 - Napravi REMOVE i REMOVE KEYWORD komande
 - Obraditi preciznije Exception-e u FileSystem.java (u celom fajlu, ima na vise mesta)
 - Pri ucitavanju, ako uspe ucitavanje, ispise informacije o nekim statistikama (npr. o broju fajlova u bazi i sl)
