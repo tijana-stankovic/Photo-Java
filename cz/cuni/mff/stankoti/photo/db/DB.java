@@ -83,11 +83,15 @@ public class DB {
     }
 
     public int addFile(DBFile file) {
-        //int oldFileID = data.getFileID(file.getLocation(), file.getFilename(), file.getExtension());
+        Set<String> keywords = null;
         int oldFileID = data.getFileID(file.getFullpath());
 
         if (oldFileID != 0) {
+            file.setID(oldFileID);
+            keywords = this.getFile(oldFileID).getKeywords();
             removeFile(oldFileID);
+        } else {
+            file.setID(this.nextFileID());
         }
 
         data.addFile(file);
@@ -99,8 +103,10 @@ public class DB {
         data.addFileTimestamp(file.getTimestamp(), fileID);
         data.addFileSize(file.getSize(), fileID);
         data.addFileChecksum(file.getChecksum(), fileID);
-        for (String keyword : file.getKeywords()) {
-            data.addFileKeyword(keyword, fileID);
+        if (oldFileID != 0) {
+            for (String keyword : keywords) {
+                this.addKeyword(keyword, fileID);
+            }
         }
         for (MetadataInfo metadataInfo : file.getMetadata()) {
             data.addFileMetadataTag(metadataInfo.getTag(), fileID);
@@ -169,6 +175,15 @@ public class DB {
         if (file != null) {
             file.addKeyword(keyword);
             data.addFileKeyword(keyword, fileID);
+            dataChanged(true);
+        }
+    }
+
+    public void removeKeyword(String keyword, int fileID) {
+        DBFile file = data.getFile(fileID);
+        if (file != null) {
+            file.removeKeyword(keyword);
+            data.removeFileKeyword(keyword, fileID);
             dataChanged(true);
         }
     }

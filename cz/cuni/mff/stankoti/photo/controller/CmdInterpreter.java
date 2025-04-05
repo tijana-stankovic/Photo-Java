@@ -177,7 +177,6 @@ public class CmdInterpreter {
         view.print("Processing file '" + filenameOnly + "'... ", false );
         DBFile file = FileSystem.getFileInformation(filename);
         if (!file.getLocation().isEmpty()) {
-            file.setID(db.nextFileID());
             if (db.addFile(file) == 0) {
                 view.print("Added.");
             } else {
@@ -243,11 +242,100 @@ public class CmdInterpreter {
     }
 
     private void remove(String[] args) {
-        view.print("Remove...");
+        if (args.length >= 2 && args[0].toUpperCase().equals("KEYWORD")) {
+            removeKeyword(Arrays.copyOfRange(args, 1, args.length));
+            return;
+        } 
+
+        if (args.length != 1) {
+            setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
+            view.printStatus(getStatusCode());
+            return;
+        } 
+
+        String path = args[0];
+        switch(FileSystem.checkPath(path)) {
+            case 'F' -> removeFile(path, false);
+            case 'D' -> removeDirectory(path);
+            case 'E' -> {
+                setStatusCode(StatusCode.PATH_DOES_NOT_EXIST);
+                view.printStatus(getStatusCode());    
+            }
+            default -> { assert false : "Unknown FileSystem.checkPath() result!"; }
+        }
+    }
+
+    private void removeFile(String filename, boolean fullPath) {
+        String filenameOnly = filename;
+        if (fullPath) {
+            filenameOnly = FileSystem.extractFilename(filename);
+        }
+        view.print("Processing file '" + filenameOnly + "'... ", false );
+        DBFile file = FileSystem.getFileInformation(filename);
+        if (!file.getLocation().isEmpty()) {
+            file.setID(db.nextFileID());
+            // if (db.removeFile(file) == 0) {
+            //     view.print("Removed.");
+            // } else {
+            //     view.print("Updated.");
+            // }
+        } else {
+            view.print("Skipped.");
+        }
+    }
+
+    private void removeDirectory(String directory) {
+        view.print("Processing directory '" + directory + "'... ", false );
+        List<String> listOfFiles = FileSystem.filesInDirectory(directory);
+        if (listOfFiles.size() == 0) {
+            setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
+            view.printStatus(getStatusCode());    
+            return;
+        }
+
+        view.print("(found " + (listOfFiles.size() - 1) + " file(s))");
+        view.print("Full path: " + listOfFiles.get(0));
+        for (int i = 1; i < listOfFiles.size(); i++) {
+            removeFile(listOfFiles.get(i), true);
+        }
     }
 
     private void removeKeyword(String[] args) {
-        view.print("Remove keyword...");
+        if (args.length != 2) {
+            setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
+            view.printStatus(getStatusCode());
+            return;
+        } 
+
+        String keyword = args[0].toUpperCase();
+        String path = args[1];
+
+        Set<Integer> fileIDs = db.getFileIDs(path, 'F');
+        if (fileIDs != null) {
+            view.print("Removing the keyword '" + keyword + "' from the specified file.");
+        } else {
+            fileIDs = db.getFileIDs(path, 'D');
+            if (fileIDs != null) {
+                view.print("Removing the keyword '" + keyword + "' from files in the specified directory.");
+                view.print("(found " + fileIDs.size() + " file(s))");
+            }
+        }
+
+        if (fileIDs != null) {
+            for (Integer fileId : fileIDs) {
+                removeKeywordFromFile(keyword, fileId);
+            }
+        } else {
+            setStatusCode(StatusCode.DB_FILE_DIR_DOES_NOT_EXIST);
+            view.printStatus(getStatusCode());
+        } 
+    }
+
+    private void removeKeywordFromFile(String keyword, int fileID) {
+        DBFile file = db.getFile(fileID);
+        view.print("Processing file '" + file.getFilename() + "." + file.getExtension() + "'... ", false );
+        db.removeKeyword(keyword, fileID);
+        view.print("Ok (fileID = " + fileID + ").");
     }
 
     private void list(String[] args) {

@@ -1,4 +1,7 @@
-- Napravi REMOVE i REMOVE KEYWORD komande
+- Napravi REMOVE file/folder komandu
+- Napraviti skracene podvarijante komandi sa KEYWORD, npr. ADD KEYWORD kao ADD KEY
+  Napraviti LIST KEYWORDS (LIST KEYS, LK), LIST FOLDERS (LFO), LIST FILES (LFI)
+  iza sledi jos jedan parametar (pattern gde mozemo da koristimo * ili ? da ogranicimo listu)
 - Obraditi preciznije Exception-e u FileSystem.java (u celom fajlu, ima na vise mesta)
 - Pri ucitavanju, ako uspe ucitavanje, ispise informacije o nekim statistikama (npr. o broju fajlova u bazi i sl)
 - prodji kroz sve komande koje imaju parametre i vidi sta nedostaje
