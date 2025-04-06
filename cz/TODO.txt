@@ -1,7 +1,20 @@
-- Napravi REMOVE file/folder komandu
 - Napraviti skracene podvarijante komandi sa KEYWORD, npr. ADD KEYWORD kao ADD KEY
-  Napraviti LIST KEYWORDS (LIST KEYS, LK), LIST FOLDERS (LFO), LIST FILES (LFI)
+  Napraviti LIST KEYWORDS (LIST KEYS, LK) - lista spisak kljucnih reci (* = svih, pattern = one koje odgovaraju patternu)
+  LIST FOLDERS (LFO), LIST FILES (LFI)  
+  (ako se sa LIST FOLDERS listaju folderi, onda su komande zasebne, a ako se listaju fajlovi u nekom
+  folderu, onda bi ovo mozda trebalo kao jedna objedinjena komanda, mozda cak i integrisana sa postojecom
+  LIST komandom gde bi stavili da ako ima neki dzoker znak u parametru komande, onda ga salje na takvu LIST obradu)
   iza sledi jos jedan parametar (pattern gde mozemo da koristimo * ili ? da ogranicimo listu)
+- ADD: kada skenira fajl, na osnovu checksuma nalazi potencijalne duplicate i obelezava ih keyword-om DUP?
+       a unutar svakog od tih fajlova ubaci id duplicata u set duplicates_pot(ential)
+       tako mozemo da izlistam sve potencijalne duplikate u bazi, kao i ko su duplicati
+- DUPLICATES, na osnovu zadatog parametra dobija se lista fajlova cije duplikate trazi, pa onda
+              za svaki od tih fajlova, vrsi poredjenje sa njegovim potencijalnim duplikima (bajt po bajt) i
+              ako nadje poklapanje, premesta ta dva fajla u set duplicates i u keyword DUP, a ako nema
+              poklapanja, samo im brise DUP? i uklanja ih medjusobno iz liste potencijalnih duplikata
+- SCAN, na osnovu skeniranja, ako ima razlike u bilo kom podatku izmedju stanja na disku sa onim u bazi,
+  markira fajl (pomocu keyworda NOT_EXIST ili CHANGED) - u ovom smislu bi mozda trebalo dodati u file jos
+  i atribut last_scan_date (kao, datum zadnjeg skeniranja fajla (to je ujedno i datum dodavanja/azuriranja)
 - Obraditi preciznije Exception-e u FileSystem.java (u celom fajlu, ima na vise mesta)
 - Pri ucitavanju, ako uspe ucitavanje, ispise informacije o nekim statistikama (npr. o broju fajlova u bazi i sl)
 - prodji kroz sve komande koje imaju parametre i vidi sta nedostaje

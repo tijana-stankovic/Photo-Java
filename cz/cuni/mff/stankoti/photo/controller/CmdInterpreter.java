@@ -5,8 +5,9 @@ import cz.cuni.mff.stankoti.photo.db.*;
 import cz.cuni.mff.stankoti.photo.view.*;
 import cz.cuni.mff.stankoti.photo.util.FileSystem;
 
-import java.util.Arrays;
 import java.util.List;
+import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.Set;
 
 public class CmdInterpreter {
@@ -254,50 +255,30 @@ public class CmdInterpreter {
         } 
 
         String path = args[0];
-        switch(FileSystem.checkPath(path)) {
-            case 'F' -> removeFile(path, false);
-            case 'D' -> removeDirectory(path);
-            case 'E' -> {
-                setStatusCode(StatusCode.PATH_DOES_NOT_EXIST);
+        Set<Integer> fileIDs = db.getFileIDs(path, 'F');
+        if (fileIDs == null) {
+            fileIDs = db.getFileIDs(path, 'D');
+            if (fileIDs != null) {
+                view.print("Processing directory '" + path + "'... ", false );
+                view.print("(found " + fileIDs.size() + " file(s))");
+            } else {
+                setStatusCode(StatusCode.DB_FILE_DIR_DOES_NOT_EXIST);
                 view.printStatus(getStatusCode());    
             }
-            default -> { assert false : "Unknown FileSystem.checkPath() result!"; }
+        }
+
+        if (fileIDs != null) {
+            for (Integer fileId : new ArrayList<>(fileIDs)) {
+                removeFile(fileId);
+            }
         }
     }
 
-    private void removeFile(String filename, boolean fullPath) {
-        String filenameOnly = filename;
-        if (fullPath) {
-            filenameOnly = FileSystem.extractFilename(filename);
-        }
-        view.print("Processing file '" + filenameOnly + "'... ", false );
-        DBFile file = FileSystem.getFileInformation(filename);
-        if (!file.getLocation().isEmpty()) {
-            file.setID(db.nextFileID());
-            // if (db.removeFile(file) == 0) {
-            //     view.print("Removed.");
-            // } else {
-            //     view.print("Updated.");
-            // }
-        } else {
-            view.print("Skipped.");
-        }
-    }
-
-    private void removeDirectory(String directory) {
-        view.print("Processing directory '" + directory + "'... ", false );
-        List<String> listOfFiles = FileSystem.filesInDirectory(directory);
-        if (listOfFiles.size() == 0) {
-            setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
-            view.printStatus(getStatusCode());    
-            return;
-        }
-
-        view.print("(found " + (listOfFiles.size() - 1) + " file(s))");
-        view.print("Full path: " + listOfFiles.get(0));
-        for (int i = 1; i < listOfFiles.size(); i++) {
-            removeFile(listOfFiles.get(i), true);
-        }
+    private void removeFile(int fileID) {
+        DBFile file = db.getFile(fileID);
+        view.print("Processing file '" + file.getFilename() + "." + file.getExtension() + "'... ", false );
+        db.removeFile(fileID);
+        view.print("Removed.");
     }
 
     private void removeKeyword(String[] args) {
