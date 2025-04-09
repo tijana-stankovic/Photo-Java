@@ -18,6 +18,8 @@ public class DBFile implements Serializable {  // Implement the Serializable int
     private long checksum;
     private Set<String> keywords;
     private Set<MetadataInfo> metadata;
+    private Set<Integer> duplicates; // list of duplicates of this file
+    private Set<Integer> potentialDuplicates; // list of potential duplicates of this file
 
     // This constructor is required for deserialization
     public DBFile() {
@@ -31,12 +33,15 @@ public class DBFile implements Serializable {  // Implement the Serializable int
         checksum = 0L;
         keywords = new HashSet<>();
         metadata = new HashSet<>();
+        duplicates = new HashSet<>();
+        potentialDuplicates = new HashSet<>();
     }
 
     public DBFile(int id, 
                 String fullpath, String location, String filename, String extension, 
                 String timestamp, long size, long checksum, 
-                Set<String> keywords, Set<MetadataInfo> metadata) {
+                Set<String> keywords, Set<MetadataInfo> metadata,
+                Set<Integer> duplicates, Set<Integer> potentialDuplicates) {
         setID(id);
         setFullpath(fullpath);
         setLocation(location);
@@ -47,6 +52,8 @@ public class DBFile implements Serializable {  // Implement the Serializable int
         setChecksum(checksum);
         setKeywords(keywords);
         setMetadata(metadata);
+        setDuplicates(duplicates);
+        setPotentialDuplicates(potentialDuplicates);
     }
 
     public int getID() {
@@ -144,6 +151,30 @@ public class DBFile implements Serializable {  // Implement the Serializable int
         }
     }
 
+    public Set<Integer> getDuplicates() {
+        return duplicates;
+    }
+
+    public void setDuplicates(Set<Integer> duplicates) {
+        if (duplicates == null) {
+            this.duplicates = new HashSet<>();
+        } else {
+            this.duplicates = duplicates;
+        }
+    }
+
+    public Set<Integer> getPotentialDuplicates() {
+        return potentialDuplicates;
+    }
+
+    public void setPotentialDuplicates(Set<Integer> potentialDuplicates) {
+        if (potentialDuplicates == null) {
+            this.potentialDuplicates = new HashSet<>();
+        } else {
+            this.potentialDuplicates = potentialDuplicates;
+        }
+    }
+
     public void addKeyword(String keyword) {
         assert keyword != null && !keyword.isEmpty() : "Keyword must be specified!";
         keywords.add(keyword.toUpperCase());
@@ -160,5 +191,23 @@ public class DBFile implements Serializable {  // Implement the Serializable int
 
     public void removeMetadata(MetadataInfo metadataInfo) {
         metadata.remove(metadataInfo);
+    }
+
+    public void addDuplicate(Integer duplicateFileID) {
+        assert duplicateFileID > 0 : "Duplicate file ID must be positive!";
+        duplicates.add(duplicateFileID);
+    }
+
+    public void removeDuplicate(Integer duplicateFileID) {
+        duplicates.remove(duplicateFileID);
+    }
+
+    public void addPotentialDuplicate(Integer potentialDuplicateFileID) {
+        assert potentialDuplicateFileID > 0 : "Potential duplicate file ID must be positive!";
+        potentialDuplicates.add(potentialDuplicateFileID);
+    }
+
+    public void removePotentialDuplicate(Integer potentialDuplicateFileID) {
+        potentialDuplicates.remove(potentialDuplicateFileID);
     }
 }

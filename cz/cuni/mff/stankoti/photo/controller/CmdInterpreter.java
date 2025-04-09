@@ -431,7 +431,55 @@ public class CmdInterpreter {
     }
 
     private void duplicates(String[] args) {
-        view.print("Duplicates...");
+        if (args.length != 1) {
+            setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
+            view.printStatus(getStatusCode());
+            return;
+        } 
+
+        String path = args[0];
+        Set<Integer> fileIDs = db.getFileIDs(path, 'F');
+        if (fileIDs != null) {
+            view.print("The specified file exists in the database.");
+        } else {
+            fileIDs = db.getFileIDs(path, 'D');
+            if (fileIDs != null) {
+                view.print("The specified directory exists in the database.");
+                view.print("(found " + fileIDs.size() + " file(s))");
+            } else {
+                String keyword = args[0].toUpperCase();
+                fileIDs = db.getFileIDs(keyword, 'K');
+                if (fileIDs != null) {
+                    view.print("The specified keyword exists in the database.");
+                    view.print("(found " + fileIDs.size() + " file(s))");
+                }    
+            }
+        }
+
+        if (fileIDs != null) {
+            int duplicatesFound = 0;
+            for (Integer fileId : fileIDs) {
+                duplicatesFound += findDuplicates(fileId);
+            }
+            if (duplicatesFound != 0) {
+                view.print(duplicatesFound + " duplicate(s) found.");
+            } else {
+                view.print("No duplicates found.");
+            }
+    } else {
+            setStatusCode(StatusCode.DB_FILE_DIR_KEYWORD_DOES_NOT_EXIST);
+            view.printStatus(getStatusCode());
+        } 
+    }
+
+    private int findDuplicates(int fileID) {
+        int duplicatesFound = 0;
+        DBFile file = db.getFile(fileID);
+        view.print(file.getFullpath() + "... ", false );
+        if (duplicatesFound == 0) {
+            view.print("no duplicates." );
+        }
+        return duplicatesFound;
     }
 
     private void scan(String[] args) {

@@ -19,6 +19,8 @@ public class DBData implements Serializable {  // Implement the Serializable int
     private Map<Long, Set<Integer>> checksums;
     private Map<String, Set<Integer>> keywords;
     private Map<String, Set<Integer>> metadataTags;
+    private Set<Integer> duplicates; // list of all files with at least one duplicate
+    private Set<Integer> potentialDuplicates; // list of all files with at least one potential duplicate
 
     public DBData() {
         lastFileID = 0;
@@ -32,6 +34,8 @@ public class DBData implements Serializable {  // Implement the Serializable int
         checksums = new HashMap<>();
         keywords = new HashMap<>();
         metadataTags = new HashMap<>();
+        duplicates = new HashSet<>();
+        potentialDuplicates = new HashSet<>();
     }
 
     public int getLastFileID() {
@@ -217,5 +221,23 @@ public class DBData implements Serializable {  // Implement the Serializable int
     public Set<Integer> getFileIDsWithKeyword(String keyword) {
         Set<Integer> fileIDs = keywords.get(keyword);
         return fileIDs;
+    }
+
+    public void addDuplicate(Integer duplicateFileID) {
+        assert duplicateFileID > 0 : "Duplicate file ID must be positive!";
+        duplicates.add(duplicateFileID);
+    }
+
+    public void removeDuplicate(Integer duplicateFileID) {
+        duplicates.remove(duplicateFileID);
+    }
+
+    public void addPotentialDuplicate(Integer potentialDuplicateFileID) {
+        assert potentialDuplicateFileID > 0 : "Potential duplicate file ID must be positive!";
+        potentialDuplicates.add(potentialDuplicateFileID);
+    }
+
+    public void removePotentialDuplicate(Integer potentialDuplicateFileID) {
+        potentialDuplicates.remove(potentialDuplicateFileID);
     }
 }
