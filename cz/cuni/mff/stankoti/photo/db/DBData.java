@@ -213,6 +213,21 @@ public class DBData implements Serializable {  // Implement the Serializable int
         return 0;
     }
 
+    // Method to get IDs of all files with specified size AND checksum
+    public Set<Integer> findPotentialDuplicatesIDs(long size, long checksum) {
+        Set<Integer> foundIDs = new HashSet<>();
+        Set<Integer> sizeIDs = sizes.getOrDefault(size, new HashSet<>());
+        Set<Integer> checksumIDs = checksums.getOrDefault(checksum, new HashSet<>());
+
+        for (int fileID : sizeIDs) {
+            if (checksumIDs.contains(fileID)) {
+                foundIDs.add(fileID);
+            }
+        }
+
+        return foundIDs;
+    }
+
     public Set<Integer> getFileIDsInLocation(String location) {
         Set<Integer> fileIDs = locations.get(location);
         return fileIDs;

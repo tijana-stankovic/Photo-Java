@@ -111,6 +111,18 @@ public class DB {
         for (MetadataInfo metadataInfo : file.getMetadata()) {
             data.addFileMetadataTag(metadataInfo.getTag(), fileID);
         }
+        
+        for (int potentialDuplicateFileID : data.findPotentialDuplicatesIDs(file.getSize(), file.getChecksum())) {
+            if (potentialDuplicateFileID != fileID) {
+                file.addPotentialDuplicate(potentialDuplicateFileID);
+                DBFile potentialDuplicateFile = data.getFile(potentialDuplicateFileID);
+                potentialDuplicateFile.addPotentialDuplicate(fileID);
+                data.addPotentialDuplicate(fileID);
+                data.addPotentialDuplicate(potentialDuplicateFileID);
+                this.addKeyword("DUP?", fileID);
+                this.addKeyword("DUP?", potentialDuplicateFileID);
+            }
+        }
     
         dataChanged(true);
 
@@ -132,6 +144,26 @@ public class DB {
         }
         for (MetadataInfo metadataInfo : file.getMetadata()) {
             data.removeFileMetadataTag(metadataInfo.getTag(), fileID);
+        }
+        data.removeDuplicate(fileID);
+        data.removeFileKeyword("DUP", fileID);
+        data.removePotentialDuplicate(fileID);
+        data.removeFileKeyword("DUP?", fileID);
+        for (int duplicateFileID : file.getDuplicates()) {
+            DBFile duplicateFile = data.getFile(duplicateFileID);
+            duplicateFile.removeDuplicate(fileID);
+            if (duplicateFile.getDuplicates().isEmpty()) {
+                data.removeDuplicate(duplicateFileID);
+                this.removeKeyword("DUP", duplicateFileID);
+            }
+        }
+        for (int potentialDuplicateFileID : file.getPotentialDuplicates()) {
+            DBFile potentialDuplicateFile = data.getFile(potentialDuplicateFileID);
+            potentialDuplicateFile.removePotentialDuplicate(fileID);
+            if (potentialDuplicateFile.getPotentialDuplicates().isEmpty()) {
+                data.removePotentialDuplicate(potentialDuplicateFileID);
+                this.removeKeyword("DUP?", potentialDuplicateFileID);
+            }
         }
 
         dataChanged(true);

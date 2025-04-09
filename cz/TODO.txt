@@ -1,6 +1,4 @@
-- ADD: kada skenira fajl, na osnovu checksuma nalazi potencijalne duplicate i obelezava ih keyword-om DUP?
-       a unutar svakog od tih fajlova ubaci id duplicata u set duplicates_pot(ential)
-       tako mozemo da izlistam sve potencijalne duplikate u bazi, kao i ko su duplicati
+- u list i details dodati prikaz podataka o duplikatima i potencijalnim duplikatima
 - DUPLICATES, na osnovu zadatog parametra dobija se lista fajlova cije duplikate trazi, pa onda
               za svaki od tih fajlova, vrsi poredjenje sa njegovim potencijalnim duplikima (bajt po bajt) i
               ako nadje poklapanje, premesta ta dva fajla u set duplicates i u keyword DUP, a ako nema
