@@ -1,6 +1,3 @@
-- SCAN, na osnovu skeniranja, ako ima razlike u bilo kom podatku izmedju stanja na disku sa onim u bazi,
-  markira fajl (pomocu keyworda NOT_EXIST ili CHANGED) - u ovom smislu bi mozda trebalo dodati u file jos
-  i atribut last_scan_date (kao, datum zadnjeg skeniranja fajla (to je ujedno i datum dodavanja/azuriranja)
 - Napraviti skracene podvarijante komandi sa KEYWORD, npr. ADD KEYWORD kao ADD KEY
   Napraviti LIST KEYWORDS (LIST KEYS, LK) - lista spisak kljucnih reci (* = svih, pattern = one koje odgovaraju patternu)
   LIST FOLDERS (LFO), LIST FILES (LFI)  

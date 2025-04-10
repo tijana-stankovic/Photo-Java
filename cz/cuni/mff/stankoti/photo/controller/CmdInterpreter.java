@@ -4,6 +4,7 @@ import cz.cuni.mff.stankoti.photo.status.StatusCode;
 import cz.cuni.mff.stankoti.photo.db.*;
 import cz.cuni.mff.stankoti.photo.view.*;
 import cz.cuni.mff.stankoti.photo.util.FileSystem;
+import cz.cuni.mff.stankoti.photo.util.MetadataInfo;
 
 import java.util.List;
 import java.util.Map;
@@ -392,7 +393,14 @@ public class CmdInterpreter {
             } else {
                 formattedOutput = filenameWithExtension + "   " + formattedTimestamp + "   " + fileSize;
             }
-            view.print(formattedOutput);
+            view.print(formattedOutput, false);
+            if (file.getKeywords().contains("CHANGED")) {
+                view.print( " (CHANGED)");
+            } else if (file.getKeywords().contains("DELETED")) {
+                view.print( " (DELETED)");
+            } else {
+                view.print("");
+            }
 
             if (detailsLevel == 'D') { // Directory info
                 view.print(prefix + "in: " + file.getLocation());
@@ -517,6 +525,89 @@ public class CmdInterpreter {
     }
 
     private void scan(String[] args) {
-        view.print("Scan...");
+        if (args.length != 1) {
+            setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
+            view.printStatus(getStatusCode());
+            return;
+        } 
+
+        String path = args[0];
+        Set<Integer> fileIDs = db.getFileIDs(path, 'F');
+        if (fileIDs != null) {
+            view.print("The specified file exists in the database.");
+        } else {
+            fileIDs = db.getFileIDs(path, 'D');
+            if (fileIDs != null) {
+                view.print("The specified directory exists in the database.");
+                view.print("(found " + fileIDs.size() + " file(s))");
+            } else {
+                String keyword = args[0].toUpperCase();
+                fileIDs = db.getFileIDs(keyword, 'K');
+                if (fileIDs != null) {
+                    view.print("The specified keyword exists in the database.");
+                    view.print("(found " + fileIDs.size() + " file(s))");
+                }    
+            }
+        }
+
+        if (fileIDs != null) {
+            for (Integer fileId : new ArrayList<>(fileIDs)) {
+                scanFile(fileId);
+            }
+        } else {
+            setStatusCode(StatusCode.DB_FILE_DIR_KEYWORD_DOES_NOT_EXIST);
+            view.printStatus(getStatusCode());
+        } 
+    }
+
+    private void scanFile(int fileID) {
+        DBFile oldFileInfo = db.getFile(fileID);
+        view.print(oldFileInfo.getFullpath() + "... ", false );
+
+        DBFile newFileInfo = FileSystem.getFileInformation(oldFileInfo.getFullpath());
+        if (!newFileInfo.getLocation().isEmpty()) {
+            if (fileChanged(oldFileInfo, newFileInfo)) {
+                db.addKeyword("CHANGED", fileID);
+                db.removeKeyword("DELETED", fileID);
+                view.print("CHANGED.");
+            } else {
+                db.removeKeyword("CHANGED", fileID);
+                db.removeKeyword("DELETED", fileID);
+                view.print("ok.");
+            }
+        } else {
+            db.addKeyword("DELETED", fileID);
+            db.removeKeyword("CHANGED", fileID);
+            view.print("DELETED.");
+        }
+    }
+
+    Boolean fileChanged(DBFile oldFileInfo, DBFile newFileInfo) {
+        Set<MetadataInfo> oldMetadata = oldFileInfo.getMetadata();
+        Set<MetadataInfo> newMetadata = newFileInfo.getMetadata();
+
+        if (!oldFileInfo.getTimestamp().equals(newFileInfo.getTimestamp()) ||
+            oldFileInfo.getSize() != newFileInfo.getSize() ||
+            oldFileInfo.getChecksum() != newFileInfo.getChecksum() || 
+            oldMetadata.size() != newMetadata.size()) {
+            return true;
+        }
+        
+        for (MetadataInfo oldMetadataInfo : oldMetadata) {
+            boolean found = false;
+            for (MetadataInfo newMetadataInfo : newMetadata) {
+                if (oldMetadataInfo.getDirectory().equals(newMetadataInfo.getDirectory()) &&
+                    oldMetadataInfo.getTag().equals(newMetadataInfo.getTag()) &&
+                    oldMetadataInfo.getDescription().equals(newMetadataInfo.getDescription())) {
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) {
+                return true;
+            }
+        }
+        
+        return false;
     }
 }
