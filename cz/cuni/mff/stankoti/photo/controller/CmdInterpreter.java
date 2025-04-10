@@ -6,7 +6,9 @@ import cz.cuni.mff.stankoti.photo.view.*;
 import cz.cuni.mff.stankoti.photo.util.FileSystem;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Set;
 
@@ -383,6 +385,7 @@ public class CmdInterpreter {
         String fileSize = FileSystem.formatFileSize(file.getSize());
         String formattedOutput;
 
+        String prefix = "   ";
         if (detailsLevel == 'F' || detailsLevel == 'D' ) { // File info or Directory info
             if (filenameWithExtension.length() + fileSize.length() + 3 <= 60) {
                 formattedOutput = String.format("%-60s   %s   %s", filenameWithExtension, formattedTimestamp, fileSize);
@@ -392,21 +395,47 @@ public class CmdInterpreter {
             view.print(formattedOutput);
 
             if (detailsLevel == 'D') { // Directory info
-                view.print("   in: " + file.getLocation());
+                view.print(prefix + "in: " + file.getLocation());
+            }
+
+            if (file.getDuplicates().size() > 0) {
+                view.print(prefix + "Duplicates: " + file.getDuplicates().size());
+            }
+            if (file.getPotentialDuplicates().size() > 0) {
+                view.print(prefix + "Potential duplicates: " + file.getPotentialDuplicates().size());
             }
         } else if (detailsLevel == 'A') { // All info
             view.print(filenameWithExtension);
-            String prefix = "   ";
             view.print(prefix + "in: " + file.getLocation());
             view.print(prefix + "ID: " + file.getID());
             view.print(prefix + "Timestamp: " + formattedTimestamp);
             view.print(prefix + "Size: " + fileSize + " (" + file.getSize() + "byte(s))");
             view.print(prefix + "CRC32: " + file.getChecksum());
+
             view.print(prefix + "Keywords: ", false);
             for (String keyword : file.getKeywords()) {
                 view.print(keyword + " ", false);
             }
             view.print("");
+
+            Set<Integer> duplicates = file.getDuplicates();
+            if (duplicates.size() > 0) {
+                view.print(prefix + "Duplicates: " + duplicates.size());
+                for (int duplicateFileID : duplicates) {
+                    DBFile duplicateFile = db.getFile(duplicateFileID);
+                    view.print(prefix + prefix + duplicateFile.getFullpath());
+                }
+            }
+
+            duplicates = file.getPotentialDuplicates();
+            if (duplicates.size() > 0) {
+                view.print(prefix + "Potential duplicates: " + duplicates.size());
+                for (int duplicateFileID : duplicates) {
+                    DBFile duplicateFile = db.getFile(duplicateFileID);
+                    view.print(prefix + prefix + duplicateFile.getFullpath());
+                }
+            }
+
             view.print(prefix + "Metadata:");
             for (var metadataTag : file.getMetadata()) {
                 view.print(prefix + prefix + metadataTag.getDirectory() + " " + metadataTag.getTag() + " " + metadataTag.getDescription());
@@ -457,29 +486,34 @@ public class CmdInterpreter {
         }
 
         if (fileIDs != null) {
-            int duplicatesFound = 0;
-            for (Integer fileId : fileIDs) {
-                duplicatesFound += findDuplicates(fileId);
+            Map<Integer, Integer> allDuplicatesFound = new HashMap<>();
+            for (Integer fileId : new ArrayList<>(fileIDs)) {
+                findDuplicates(fileId, allDuplicatesFound);
             }
-            if (duplicatesFound != 0) {
-                view.print(duplicatesFound + " duplicate(s) found.");
-            } else {
+            if (allDuplicatesFound.size() == 0) {
                 view.print("No duplicates found.");
             }
-    } else {
+        } else {
             setStatusCode(StatusCode.DB_FILE_DIR_KEYWORD_DOES_NOT_EXIST);
             view.printStatus(getStatusCode());
         } 
     }
 
-    private int findDuplicates(int fileID) {
-        int duplicatesFound = 0;
+    private void findDuplicates(int fileID, Map<Integer, Integer> allDuplicatesFound) {
         DBFile file = db.getFile(fileID);
         view.print(file.getFullpath() + "... ", false );
-        if (duplicatesFound == 0) {
+
+        Integer numOfDuplicates = allDuplicatesFound.get(fileID);
+        if (numOfDuplicates == null) {
+            Map<Integer, Integer> newDuplicatesFound = db.processDuplicates(fileID);
+            allDuplicatesFound.putAll(newDuplicatesFound);
+            numOfDuplicates = allDuplicatesFound.get(fileID);
+        }
+        if (numOfDuplicates != null) {
+            view.print(numOfDuplicates + " duplicate(s)" );
+        } else {
             view.print("no duplicates." );
         }
-        return duplicatesFound;
     }
 
     private void scan(String[] args) {

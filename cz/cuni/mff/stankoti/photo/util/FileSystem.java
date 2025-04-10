@@ -1,5 +1,7 @@
 package cz.cuni.mff.stankoti.photo.util;
 
+import cz.cuni.mff.stankoti.photo.db.DBFile;
+
 import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -8,6 +10,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -18,8 +21,6 @@ import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
-
-import cz.cuni.mff.stankoti.photo.db.DBFile;
 
 public class FileSystem {
     public static char checkPath(String path) {
@@ -183,4 +184,42 @@ public class FileSystem {
 
         return metadataSet;
     }   
+
+    public static boolean compareFiles(String path1, String path2) {
+        try {
+            File file1 = new File(path1);
+            File file2 = new File(path2);
+
+            if (!file1.isFile() || !file2.isFile()) {
+                return false;
+            }
+
+            if (file1.length() != file2.length()) {
+                return false;
+            }
+
+            try (FileInputStream stream1 = new FileInputStream(file1);
+                FileInputStream stream2 = new FileInputStream(file2)) {
+
+                byte[] buffer1 = new byte[1024];
+                byte[] buffer2 = new byte[1024];
+
+                int bytesRead1;
+                int bytesRead2;
+
+                while ((bytesRead1 = stream1.read(buffer1)) != -1) {
+                    bytesRead2 = stream2.read(buffer2);
+
+                    if (bytesRead1 != bytesRead2 || !Arrays.equals(buffer1, buffer2)) {
+                        return false;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            //e.printStackTrace();
+            return false;
+        }
+
+        return true;
+    }
 }

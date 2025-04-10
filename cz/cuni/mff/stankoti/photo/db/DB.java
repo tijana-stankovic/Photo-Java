@@ -2,6 +2,7 @@ package cz.cuni.mff.stankoti.photo.db;
 
 import cz.cuni.mff.stankoti.photo.status.StatusCode;
 import cz.cuni.mff.stankoti.photo.util.MetadataInfo;
+import cz.cuni.mff.stankoti.photo.util.FileSystem;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -11,7 +12,9 @@ import java.io.InvalidClassException;
 import java.io.NotSerializableException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class DB {
@@ -119,8 +122,8 @@ public class DB {
                 potentialDuplicateFile.addPotentialDuplicate(fileID);
                 data.addPotentialDuplicate(fileID);
                 data.addPotentialDuplicate(potentialDuplicateFileID);
-                this.addKeyword("DUP?", fileID);
-                this.addKeyword("DUP?", potentialDuplicateFileID);
+                addKeyword("DUP?", fileID);
+                addKeyword("DUP?", potentialDuplicateFileID);
             }
         }
     
@@ -145,16 +148,21 @@ public class DB {
         for (MetadataInfo metadataInfo : file.getMetadata()) {
             data.removeFileMetadataTag(metadataInfo.getTag(), fileID);
         }
-        data.removeDuplicate(fileID);
-        data.removeFileKeyword("DUP", fileID);
-        data.removePotentialDuplicate(fileID);
-        data.removeFileKeyword("DUP?", fileID);
+
+        removeFileDuplicateInformation(file);
+
+        dataChanged(true);
+    }
+
+    public void removeFileDuplicateInformation(DBFile file) {
+        int fileID = file.getID();
+        
         for (int duplicateFileID : file.getDuplicates()) {
             DBFile duplicateFile = data.getFile(duplicateFileID);
             duplicateFile.removeDuplicate(fileID);
             if (duplicateFile.getDuplicates().isEmpty()) {
                 data.removeDuplicate(duplicateFileID);
-                this.removeKeyword("DUP", duplicateFileID);
+                removeKeyword("DUP", duplicateFileID);
             }
         }
         for (int potentialDuplicateFileID : file.getPotentialDuplicates()) {
@@ -162,11 +170,57 @@ public class DB {
             potentialDuplicateFile.removePotentialDuplicate(fileID);
             if (potentialDuplicateFile.getPotentialDuplicates().isEmpty()) {
                 data.removePotentialDuplicate(potentialDuplicateFileID);
-                this.removeKeyword("DUP?", potentialDuplicateFileID);
+                removeKeyword("DUP?", potentialDuplicateFileID);
             }
         }
 
+        file.setDuplicates(null);
+        file.setPotentialDuplicates(null);
+        data.removeDuplicate(fileID);
+        removeKeyword("DUP", fileID);
+        data.removePotentialDuplicate(fileID);
+        removeKeyword("DUP?", fileID);
+
         dataChanged(true);
+    }
+
+    public Map<Integer, Integer> processDuplicates(int fileID) {
+        Set<Integer> duplicatesIDs = new HashSet<>();
+        duplicatesIDs.add(fileID);
+        DBFile file = data.getFile(fileID);
+        for (int duplicateFileID : data.findPotentialDuplicatesIDs(file.getSize(), file.getChecksum())) {
+            if (duplicateFileID != fileID) {
+                DBFile duplicateFile = data.getFile(duplicateFileID);
+                if (FileSystem.compareFiles(file.getFullpath(), duplicateFile.getFullpath())) {
+                    duplicatesIDs.add(duplicateFileID);
+                }
+            }
+        }
+
+        Map<Integer, Integer> duplicatesFound = new HashMap<>();
+        int numOfDuplicates = duplicatesIDs.size() - 1;
+        if (numOfDuplicates > 0) {
+            for (int fID : duplicatesIDs) {
+                removeFileDuplicateInformation(data.getFile(fID));
+                duplicatesFound.put(fID, numOfDuplicates);
+            }
+            for (int fID : duplicatesIDs) {
+                file = data.getFile(fID);
+                for (int fDupID : duplicatesIDs) {
+                    if (fID != fDupID) {
+                        file.addDuplicate(fDupID);
+                        addKeyword("DUP", fID);
+                        data.addDuplicate(fID);
+                    }
+                }
+            }
+        } else {
+            removeFileDuplicateInformation(file);
+        }
+
+        dataChanged(true);
+
+        return duplicatesFound;
     }
 
     public int nextFileID() {
