@@ -5,7 +5,7 @@ import cz.cuni.mff.stankoti.photo.status.StatusMessages;
 
 public class View {
     public void fullProgramInfo() {
-        String version = "0.1";
+        String version = "0.9";
         String projectName = "Photo Organizer";
         String course = "Programming in Java Language - NPRG013 - student project";
         String author = "Tijana Stankovic";

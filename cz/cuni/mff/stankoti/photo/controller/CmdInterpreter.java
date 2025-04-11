@@ -64,6 +64,7 @@ public class CmdInterpreter {
             case "R", "REMOVE" -> remove(cmd.args);
             case "RK" -> removeKeyword(cmd.args);
             case "L", "LIST" -> list(cmd.args);
+            case "LK" -> listKeywords(cmd.args);
             case "D", "DETAILS" -> details(cmd.args);
             case "DUP", "DD", "DUPLICATES" -> duplicates(cmd.args);
             case "S", "SCAN" -> scan(cmd.args);
@@ -150,7 +151,8 @@ public class CmdInterpreter {
     }
 
     private void add(String[] args) {
-        if (args.length >= 2 && args[0].toUpperCase().equals("KEYWORD")) {
+        if (args.length >= 1 && (args[0].toUpperCase().equals("KEYWORD") || 
+                                 args[0].toUpperCase().equals("KEY"))) {
             addKeyword(Arrays.copyOfRange(args, 1, args.length));
             return;
         } 
@@ -246,7 +248,8 @@ public class CmdInterpreter {
     }
 
     private void remove(String[] args) {
-        if (args.length >= 2 && args[0].toUpperCase().equals("KEYWORD")) {
+        if (args.length >= 1 && (args[0].toUpperCase().equals("KEYWORD") || 
+                                 args[0].toUpperCase().equals("KEY"))) {
             removeKeyword(Arrays.copyOfRange(args, 1, args.length));
             return;
         } 
@@ -323,6 +326,12 @@ public class CmdInterpreter {
     }
 
     private void list(String[] args) {
+        if (args.length >= 1 && (args[0].toUpperCase().equals("KEYWORDS") || 
+                                 args[0].toUpperCase().equals("KEYS"))) {
+            listKeywords(Arrays.copyOfRange(args, 1, args.length));
+            return;
+        } 
+
         list(args, false);
     }
 
@@ -461,6 +470,19 @@ public class CmdInterpreter {
         String second = dateTime.substring(13, 15);
         String formattedDateTime = day + "." + month + "." + year + " " + hour + ":" + minute + ":" + second;
         return formattedDateTime;
+    }
+
+    private void listKeywords(String[] args) {
+        if (args.length > 0) {
+            setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
+            view.printStatus(getStatusCode());
+            return;
+        } 
+
+        view.print("List of keywords in the database:");
+        for (String keyword : db.getKeywords()) {
+            view.print("   " + keyword);
+        }
     }
 
     private void details(String[] args) {

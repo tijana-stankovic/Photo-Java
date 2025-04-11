@@ -1,8 +1,11 @@
 package cz.cuni.mff.stankoti.photo.db;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -49,6 +52,13 @@ public class DBData implements Serializable {  // Implement the Serializable int
     public int nextFileID() {
         setLastFileID(getLastFileID() + 1);
         return getLastFileID();
+    }
+
+    
+    public List<String> getKeywords() {
+        List<String> keys = new ArrayList<>(keywords.keySet());
+        Collections.sort(keys);
+        return keys;
     }
 
     public DBFile getFile(int fileID) {

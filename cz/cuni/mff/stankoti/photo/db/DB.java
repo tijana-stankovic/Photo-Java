@@ -14,6 +14,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -272,5 +273,9 @@ public class DB {
             data.removeFileKeyword(keyword, fileID);
             dataChanged(true);
         }
+    }
+
+    public List<String> getKeywords() {
+        return data.getKeywords();
     }
 }
