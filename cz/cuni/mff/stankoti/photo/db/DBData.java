@@ -54,11 +54,16 @@ public class DBData implements Serializable {  // Implement the Serializable int
         return getLastFileID();
     }
 
-    
     public List<String> getKeywords() {
         List<String> keys = new ArrayList<>(keywords.keySet());
         Collections.sort(keys);
         return keys;
+    }
+
+    public List<String> getDirectories() {
+        List<String> dirs = new ArrayList<>(locations.keySet());
+        Collections.sort(dirs);
+        return dirs;
     }
 
     public DBFile getFile(int fileID) {
@@ -264,5 +269,15 @@ public class DBData implements Serializable {  // Implement the Serializable int
 
     public void removePotentialDuplicate(Integer potentialDuplicateFileID) {
         potentialDuplicates.remove(potentialDuplicateFileID);
+    }
+
+    public Map<String, Integer> getDBStatistics() {
+        Map<String, Integer> dbStatistics = new HashMap<>();
+        dbStatistics.put("FILES", files.size());
+        dbStatistics.put("DIRS", locations.size());
+        dbStatistics.put("KEYS", keywords.size());
+        dbStatistics.put("DUPS", duplicates.size());
+        dbStatistics.put("DUP?S", potentialDuplicates.size());
+        return dbStatistics;
     }
 }

@@ -278,4 +278,12 @@ public class DB {
     public List<String> getKeywords() {
         return data.getKeywords();
     }
+
+    public List<String> getDirectories() {
+        return data.getDirectories();
+    }
+
+    public Map<String, Integer> getDBStatistics() {
+        return data.getDBStatistics();
+    }
 }

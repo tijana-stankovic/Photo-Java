@@ -23,6 +23,9 @@ public class Controller {
             default -> view.printStatus(StatusCode.UNEXPECTED_STATUS);
         }
 
+        view.print("");
+        view.printDBStatistics(db.getDBStatistics());
+
         interpreter = new CmdInterpreter(db, view);
     }
 

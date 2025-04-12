@@ -65,6 +65,7 @@ public class CmdInterpreter {
             case "RK" -> removeKeyword(cmd.args);
             case "L", "LIST" -> list(cmd.args);
             case "LK" -> listKeywords(cmd.args);
+            case "LD", "LF" -> listDirectories(cmd.args);
             case "D", "DETAILS" -> details(cmd.args);
             case "DUP", "DD", "DUPLICATES" -> duplicates(cmd.args);
             case "S", "SCAN" -> scan(cmd.args);
@@ -332,11 +333,21 @@ public class CmdInterpreter {
             return;
         } 
 
+        if (args.length >= 1 && (args[0].toUpperCase().equals("DIRECTORIES") || 
+                                 args[0].toUpperCase().equals("DIRS") || 
+                                 args[0].toUpperCase().equals("FOLDERS"))) {
+            listDirectories(Arrays.copyOfRange(args, 1, args.length));
+            return;
+        } 
+
         list(args, false);
     }
 
     private void list(String[] args, Boolean allDetails) {
-        if (args.length != 1) {
+        if (args.length == 0) {
+            view.printDBStatistics(db.getDBStatistics());
+            return;
+        } else if (args.length > 1) {
             setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
             view.printStatus(getStatusCode());
             return;
@@ -482,6 +493,19 @@ public class CmdInterpreter {
         view.print("List of keywords in the database:");
         for (String keyword : db.getKeywords()) {
             view.print("   " + keyword);
+        }
+    }
+
+    private void listDirectories(String[] args) {
+        if (args.length > 0) {
+            setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
+            view.printStatus(getStatusCode());
+            return;
+        } 
+
+        view.print("List of directories in the database:");
+        for (String dir : db.getDirectories()) {
+            view.print("   " + dir);
         }
     }
 
