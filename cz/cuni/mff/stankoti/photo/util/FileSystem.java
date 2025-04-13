@@ -1,6 +1,7 @@
 package cz.cuni.mff.stankoti.photo.util;
 
 import cz.cuni.mff.stankoti.photo.db.DBFile;
+import cz.cuni.mff.stankoti.photo.status.StatusCode;
 
 import java.io.BufferedInputStream;
 import java.io.File;
@@ -23,6 +24,16 @@ import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
 public class FileSystem {
+    private static StatusCode statusCode;
+
+    public static StatusCode getStatusCode() {
+        return statusCode;
+    }
+
+    public static void setStatusCode(StatusCode newStatusCode) {
+        statusCode = newStatusCode;
+    }
+
     public static char checkPath(String path) {
         File file = new File(path);
 
@@ -39,6 +50,8 @@ public class FileSystem {
     public static List<String> filesInDirectory(String directory) {
         List<String> listOfFiles = new ArrayList<>();
 
+        setStatusCode(StatusCode.NO_ERROR);
+
         File dir = new File(directory);
         if (dir.isDirectory()) {
             try {
@@ -51,7 +64,7 @@ public class FileSystem {
                     }
                 }
             } catch (IOException e) {
-                // System.err.println("Error resolving canonical path: " + e.getMessage());
+                setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
             }
         }
 
@@ -59,10 +72,6 @@ public class FileSystem {
     }
 
     public static DBFile getFileInformation(String filename) {
-        return getFileInformation(filename, true);
-    }
-
-    public static DBFile getFileInformation(String filename, boolean fullInfo) {
         String fullpath = "";
         String location = "";
         String fname = "";
@@ -72,6 +81,8 @@ public class FileSystem {
         long checksum = 0L;
         Set<String> keywords = new HashSet<>();
         Set<MetadataInfo> metadata = new HashSet<>();
+
+        setStatusCode(StatusCode.NO_ERROR);
 
         DBFile dbFile = new DBFile();
 
@@ -99,30 +110,31 @@ public class FileSystem {
                 dbFile.setFilename(fname);
                 dbFile.setExtension(extension);
 
-                if (fullInfo) {
-                    // HH for 24-hour format
-                    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss").withZone(ZoneId.systemDefault());  // Use system timezone
-                    timestamp = formatter.format(Instant.ofEpochMilli(file.lastModified()));
+                // HH for 24-hour format
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss").withZone(ZoneId.systemDefault());  // Use system timezone
+                timestamp = formatter.format(Instant.ofEpochMilli(file.lastModified()));
 
-                    size = file.length();
-                    checksum = calculateChecksum(file);
-                    metadata = readMetadata(file);
+                size = file.length();
+                checksum = calculateChecksum(file);
+                metadata = readMetadata(file);
 
-                    dbFile.setTimestamp(timestamp);
-                    dbFile.setSize(size);
-                    dbFile.setChecksum(checksum);
-                    dbFile.setKeywords(keywords);
-                    dbFile.setMetadata(metadata);
-                }
+                dbFile.setTimestamp(timestamp);
+                dbFile.setSize(size);
+                dbFile.setChecksum(checksum);
+                dbFile.setKeywords(keywords);
+                dbFile.setMetadata(metadata);
+            } else {
+                setStatusCode(StatusCode.FILE_SYSTEM_NOT_FILE);
             }
         } catch (IOException e) {
-            // System.err.println("Error resolving canonical path: " + e.getMessage());
+            setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
         }               
 
         return dbFile;
     }
 
     public static long calculateChecksum(File file) {
+        setStatusCode(StatusCode.NO_ERROR);
         CRC32 crc = new CRC32();
         try (BufferedInputStream bis = new BufferedInputStream(new FileInputStream(file))) {
             byte[] buffer = new byte[8192];
@@ -131,7 +143,7 @@ public class FileSystem {
                 crc.update(buffer, 0, bytesRead);
             }
         } catch (IOException e) {
-            System.err.println("Error reading file: " + e.getMessage());
+            setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
         }
         return crc.getValue();
     }
@@ -163,6 +175,7 @@ public class FileSystem {
     }    
 
     public static Set<MetadataInfo> readMetadata(File file) {
+        setStatusCode(StatusCode.NO_ERROR);
         Set<MetadataInfo> metadataSet = new HashSet<>();
 
         try {
@@ -174,18 +187,20 @@ public class FileSystem {
                     }
                 }
             } else {
-                System.out.println("File is not an image.");
+                setStatusCode(StatusCode.FILE_SYSTEM_NOT_IMAGE);
             }
         } catch (ImageProcessingException e) {
-            System.out.println("File is not an image.");
+            setStatusCode(StatusCode.FILE_SYSTEM_NOT_IMAGE);
         } catch (IOException e) {
-            e.printStackTrace();
+            setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
         }
 
         return metadataSet;
     }   
 
     public static boolean compareFiles(String path1, String path2) {
+        setStatusCode(StatusCode.NO_ERROR);
+
         try {
             File file1 = new File(path1);
             File file2 = new File(path2);
@@ -216,7 +231,7 @@ public class FileSystem {
                 }
             }
         } catch (IOException e) {
-            //e.printStackTrace();
+            setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
             return false;
         }
 

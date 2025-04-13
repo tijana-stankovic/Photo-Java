@@ -20,6 +20,8 @@ public class StatusMessages {
         statusMessages.put(StatusCode.INVALID_NUMBER_OF_ARGUMENTS, "ERROR: Invalid number of arguments.");
         statusMessages.put(StatusCode.PATH_DOES_NOT_EXIST, "ERROR: Path does not exists.");
         statusMessages.put(StatusCode.FILE_SYSTEM_ERROR, "ERROR: Error reading file system.");
+        statusMessages.put(StatusCode.FILE_SYSTEM_NOT_FILE, "WARNING: Not a file.");
+        statusMessages.put(StatusCode.FILE_SYSTEM_NOT_IMAGE, "WARNING: File is not an image.");
     }
 
     public static String getStatusMessage(StatusCode statusCode) {

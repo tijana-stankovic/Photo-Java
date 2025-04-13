@@ -182,22 +182,39 @@ public class CmdInterpreter {
             filenameOnly = FileSystem.extractFilename(filename);
         }
         view.print("Processing file '" + filenameOnly + "'... ", false );
+
         DBFile file = FileSystem.getFileInformation(filename);
-        if (!file.getLocation().isEmpty()) {
-            if (db.addFile(file) == 0) {
-                view.print("Added.");
-            } else {
-                view.print("Updated.");
+
+        switch (FileSystem.getStatusCode()) {
+            case StatusCode.NO_ERROR -> {
+                if (db.addFile(file) == 0) {
+                    view.print("Added.");
+                } else {
+                    view.print("Updated.");
+                }
             }
-        } else {
-            view.print("Skipped.");
+
+            case StatusCode.FILE_SYSTEM_ERROR -> {
+                    setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
+                    view.print("ERROR! (Error reading file)... Skipped.");
+                 }
+
+            case StatusCode.FILE_SYSTEM_NOT_FILE -> {
+                    view.print("WARNING! (Not a file)... Skipped.");
+                }
+
+            case StatusCode.FILE_SYSTEM_NOT_IMAGE -> {
+                    view.print("WARNING! (Not an image)... Skipped.");
+                }
+                
+            default -> { assert false : "Unknown FileSystem error code"; }
         }
     }
 
     private void addDirectory(String directory) {
         view.print("Processing directory '" + directory + "'... ", false );
         List<String> listOfFiles = FileSystem.filesInDirectory(directory);
-        if (listOfFiles.size() == 0) {
+        if (listOfFiles.size() == 0 || FileSystem.getStatusCode() == StatusCode.FILE_SYSTEM_ERROR) {
             setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
             view.printStatus(getStatusCode());    
             return;
@@ -611,20 +628,38 @@ public class CmdInterpreter {
         view.print(oldFileInfo.getFullpath() + "... ", false );
 
         DBFile newFileInfo = FileSystem.getFileInformation(oldFileInfo.getFullpath());
-        if (!newFileInfo.getLocation().isEmpty()) {
-            if (fileChanged(oldFileInfo, newFileInfo)) {
-                db.addKeyword("CHANGED", fileID);
-                db.removeKeyword("DELETED", fileID);
-                view.print("CHANGED.");
-            } else {
-                db.removeKeyword("CHANGED", fileID);
-                db.removeKeyword("DELETED", fileID);
-                view.print("ok.");
+
+        switch (FileSystem.getStatusCode()) {
+            case StatusCode.NO_ERROR -> {
+                if (fileChanged(oldFileInfo, newFileInfo)) {
+                    db.addKeyword("CHANGED", fileID);
+                    db.removeKeyword("DELETED", fileID);
+                    view.print("CHANGED.");
+                } else {
+                    db.removeKeyword("CHANGED", fileID);
+                    db.removeKeyword("DELETED", fileID);
+                    view.print("ok.");
+                }
             }
-        } else {
-            db.addKeyword("DELETED", fileID);
-            db.removeKeyword("CHANGED", fileID);
-            view.print("DELETED.");
+
+            case StatusCode.FILE_SYSTEM_ERROR -> {
+                    setStatusCode(StatusCode.FILE_SYSTEM_ERROR);
+                    view.print("ERROR! (Error reading file)... Skipped.");
+                 }
+
+            case StatusCode.FILE_SYSTEM_NOT_FILE -> {
+                    db.addKeyword("DELETED", fileID);
+                    db.removeKeyword("CHANGED", fileID);
+                    view.print("DELETED.");
+                }
+
+            case StatusCode.FILE_SYSTEM_NOT_IMAGE -> {
+                    db.addKeyword("CHANGED", fileID);
+                    db.removeKeyword("DELETED", fileID);
+                    view.print("CHANGED.");
+                }
+                
+            default -> { assert false : "Unknown FileSystem error code"; }
         }
     }
 
