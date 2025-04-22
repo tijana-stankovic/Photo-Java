@@ -55,10 +55,10 @@ public class CmdInterpreter {
 
         switch (command) {
             case "" -> {} // do nothing
-            case "H", "HELP" -> help(cmd.args);
+            case "H", "HELP" -> help();
             case "AB", "ABOUT" -> about();
             case "E", "X", "EXIT" -> exit();
-            case "SAVE" -> save();
+            case "SAVE" -> save(cmd.args);
             case "A", "ADD" -> add(cmd.args);
             case "AK" -> addKeyword(cmd.args);
             case "R", "REMOVE" -> remove(cmd.args);
@@ -77,7 +77,7 @@ public class CmdInterpreter {
         }
     }
 
-    private void help(String[] args) {
+    private void help() {
         view.print("List of available commands:");
         view.print("- HELP (H)");
         view.print("  Display page with list of commands.");
@@ -86,30 +86,54 @@ public class CmdInterpreter {
         view.print("- EXIT (E, X)");
         view.print("  Exiting the program.");
         view.print("  If there are unsaved changes, the program will display a control question.");
-        view.print("- SAVE");
+        view.print("- SAVE [<db-filename>]");
         view.print("  Saving the current memory state to a local file.");
         view.print("  Default name for this file: photo_db.pdb");
-        view.print("  The name of the file can be specified as a parameter when starting the program.");
+        view.print("  New filename can be specified as parameter.");
+        view.print("  The name of the file can also be specified as a parameter when starting the program.");
         view.print("- ADD (A)");
-        view.print("  ...");
+        view.print("    - ADD <folder> or <filename>");
+        view.print("      Adds all images from the specified <folder> or");
+        view.print("      only the one specified by <filename> to the in-memory database.");
+        view.print("    - ADD KEYWORD <keyword> <folder> or <filename>");
+        view.print("      All images from the specified folder <folder> or");
+        view.print("      only the one specified by <filename> get the keyword specified by <keyword>.");
         view.print("- AK");
-        view.print("  ...");
+        view.print("  Short form for ADD KEYWORD command. For details, see ADD command.");
         view.print("- REMOVE (R)");
-        view.print("  ...");
+        view.print("    - REMOVE <folder> or <filename>");
+        view.print("      Removes all images from the specified <folder> (including the folder) or");
+        view.print("      only the one specified by <filename> from the in-memory database.");
+        view.print("    - REMOVE KEYWORD <keyword> <folder> or <filename>");
+        view.print("      All images belonging to the folder <folder> or");
+        view.print("      only the one specified by <filename> will have the specified <keyword> removed from them.");
         view.print("- RK");
-        view.print("  ...");
+        view.print("  Short form for REMOVE KEYWORD command. For details, see REMOVE command.");
         view.print("- LIST (L)");
-        view.print("  ...");
+        view.print("    - LIST <keyword> or <folder>");
+        view.print("      Lists all images that have the specified keyword or belong to the specified folder.");
+        view.print("    - LIST KEYWORDS (LIST KEYS)");
+        view.print("      Lists all existing keywords in the database.");
+        view.print("    - LIST DIRECTORIES (LIST DIRS, LIST FOLDERS)");
+        view.print("      Lists all existing directories (folders) in the database.");
+        view.print("- LK");
+        view.print("  Short form for LIST KEYWORDS command. For details, see LIST command.");
+        view.print("- LD (LF)");
+        view.print("  Short form for LIST DIRECTORIES command. For details, see LIST command.");
         view.print("- DETAILS (D)");
-        view.print("  ...");
+        view.print("  DETAILS <keyword> or <folder> or <file>");
+        view.print("  Lists all images that have the given keyword or belong to the given folder or");
+        view.print("  given file and displays detailed information about them.");
         view.print("- DUPLICATES (DUP, DD)");
-        view.print("  ...");
+        view.print("  DUPLICATES <keyword> or <folder> or <file>");
+        view.print("  Finds duplicates in a set of images determined by a given parameter (comparing files byte by byte).");
         view.print("- SCAN (S)");
-        view.print("  ...");
+        view.print("  SCAN <keyword> or <folder> or <file>");
+        view.print("  Compares the set of images determined by the given parameter with the current state on the disk.");
     }
 
     private void about() {
-        view.print("About...");
+        view.fullProgramInfo();
     }
 
     private void exit() {
@@ -133,12 +157,29 @@ public class CmdInterpreter {
         }
     }
 
+    private void save(String[] args) {
+        if (args.length > 1) {
+            setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
+            view.printStatus(getStatusCode());
+            return;
+        }
+
+        if (args.length == 1) {
+            String newDbFilename = args[0];
+            if (!db.getDbFilename().equals(newDbFilename)) {
+                db.setDbFilename(newDbFilename);
+            }
+        }
+        
+        save();
+    }
+
     private void save() {
         if (db.isChanged()) {
             db.WriteDB();
 
             switch (db.getStatusCode()) {
-                case StatusCode.NO_ERROR -> view.print("Changes saved successfully.");
+                case StatusCode.NO_ERROR -> view.print("Changes saved successfully (DB filename: '" + db.getDbFilename() + "').");
                 case StatusCode.DB_FILE_NOT_SERIALIZABLE,
                      StatusCode.DB_FILE_WRITE_ERROR -> {
                         view.printStatus(db.getStatusCode());

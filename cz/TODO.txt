@@ -1,5 +1,3 @@
-- napraviti save sa mogucnoscu dodavanja parametra (ime novog db fajla)
-- prodji kroz sve komande koje imaju parametre i vidi sta nedostaje
 - Komentari
 - Test primeri
 

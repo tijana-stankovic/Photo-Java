@@ -34,13 +34,13 @@ public class Controller {
 
         if (args.length == 0) {
             fileName = DB.DEFAULT_DB_FILENAME;
-            view.print("The default name of the db file will be used: " + fileName);
+            view.print("The default name of the DB file will be used: " + fileName);
         } else {
             fileName = args[0];
             if (!fileName.contains(".")) {
                 fileName += ".pdb";
             }
-            view.print("The db filename: " + fileName);
+            view.print("The DB filename: " + fileName);
         }
 
         return fileName;

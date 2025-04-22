@@ -29,8 +29,8 @@ public class DB {
 
     public DB(String dbFilename) {
         setStatusCode(StatusCode.NO_ERROR);
+        setDbFilename(dbFilename);
         data = new DBData();
-        this.dbFilename = dbFilename;
         ReadDB();
     }
 
@@ -48,6 +48,18 @@ public class DB {
 
     public void dataSaved(boolean dataSaved) {
         dataChanged = !dataSaved;
+    }
+
+    public String getDbFilename() {
+        return dbFilename;
+    }
+
+    public void setDbFilename(String dbFilename) {
+        assert dbFilename != null && !dbFilename.isEmpty() : "DB filename must be specified!";
+        if (this.dbFilename == null || !this.dbFilename.equals(dbFilename)) {
+            this.dbFilename = dbFilename;
+            dataChanged(true);
+        }
     }
 
     public StatusCode getStatusCode() {
