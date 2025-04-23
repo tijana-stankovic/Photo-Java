@@ -18,6 +18,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+  * The top-level class of the Model.
+  * <p>
+  * It provides methods for accessing the Photo database as a whole.
+  * </p>
+  */
 public class DB {
     public static final String DEFAULT_DB_FILENAME = "photo_db.pdb";
 

@@ -2,9 +2,13 @@ package cz.cuni.mff.stankoti.photo.status;
 
 import java.util.HashMap;
 
+/**
+  * Class for mapping status codes to their respective messages.
+  */
 public class StatusMessages {
     private static final HashMap<StatusCode, String> statusMessages = new HashMap<>();
 
+    // Initializes the status messages for each status code.
     static {
         statusMessages.put(StatusCode.NO_ERROR, "No error.");
         statusMessages.put(StatusCode.UNEXPECTED_STATUS, "WARNING: Unexpected program status.");
@@ -24,6 +28,12 @@ public class StatusMessages {
         statusMessages.put(StatusCode.FILE_SYSTEM_NOT_IMAGE, "WARNING: File is not an image.");
     }
 
+    /**
+      * Returns the message corresponding to the given status code.
+      *
+      * @param statusCode the status code
+      * @return the corresponding message
+      */
     public static String getStatusMessage(StatusCode statusCode) {
         return statusMessages.getOrDefault(statusCode, "WARNING: Unknown program status code.");
     }    

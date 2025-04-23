@@ -7,6 +7,9 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 
+/**
+  * A class with methods for handling user input.
+  */
 public class CLI implements AutoCloseable {
     private BufferedReader input;
 

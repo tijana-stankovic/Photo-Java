@@ -13,6 +13,12 @@ import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.Set;
 
+/**
+  * The main processing class of the Controller.
+  * <p>
+  * It executes all commands of the Photo application and is responsible for communication with the Model and View parts
+  * </p>
+  */
 public class CmdInterpreter {
     private DB db;
     private View view;

@@ -23,17 +23,36 @@ import com.drew.metadata.Directory;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.Tag;
 
+/**
+  * A class with methods for file system access and reading directories, files, and metadata information.
+  */
 public class FileSystem {
     private static StatusCode statusCode;
 
+    /**
+      * Gets the last FileSystem status code.
+      *
+      * @return the last FileSystem status code
+      */
     public static StatusCode getStatusCode() {
         return statusCode;
     }
 
+    /**
+      * Sets a FileSystem status code.
+      *
+      * @param newStatusCode the FileSystem new status code
+      */
     public static void setStatusCode(StatusCode newStatusCode) {
         statusCode = newStatusCode;
     }
 
+    /**
+      * Checks the type of the given path.
+      *
+      * @param path the path to check
+      * @return 'F' if it's a file, 'D' if it's a directory, 'E' if it doesn't exist
+      */
     public static char checkPath(String path) {
         File file = new File(path);
 
@@ -47,6 +66,12 @@ public class FileSystem {
         return 'E'; // Path doesn't exist
     }
 
+    /**
+      * Gets a list of all files in the given directory.
+      *
+      * @param directory the directory path
+      * @return a list of file paths in the directory (first element in the list is the directory path itself)
+      */
     public static List<String> filesInDirectory(String directory) {
         List<String> listOfFiles = new ArrayList<>();
 
@@ -71,6 +96,13 @@ public class FileSystem {
         return listOfFiles;
     }
 
+
+    /**
+      * Gets detailed information about a file.
+      *
+      * @param filename the name of the file to get information about
+      * @return a DBFile object containing the file information
+      */
     public static DBFile getFileInformation(String filename) {
         String fullpath = "";
         String location = "";
@@ -133,6 +165,18 @@ public class FileSystem {
         return dbFile;
     }
 
+    /**
+      * Calculates the checksum of a file using CRC32.
+      * <p>
+      * Based on:
+      * <ul>
+      *     <li>https://stackoverflow.com/questions/7776069/confirming-file-content-against-hash</li>
+      *     <li>https://stackoverflow.com/questions/75138079/how-to-calculate-checksum-with-inputstream-and-then-use-it-again?utm_source=chatgpt.com</li>
+      * </ul>
+      *
+      * @param file the file to calculate the checksum for
+      * @return the checksum value
+      */
     public static long calculateChecksum(File file) {
         setStatusCode(StatusCode.NO_ERROR);
         CRC32 crc = new CRC32();
@@ -148,6 +192,12 @@ public class FileSystem {
         return crc.getValue();
     }
 
+    /**
+      * Extracts the filename from a given path.
+      *
+      * @param filename the full path of the file
+      * @return the extracted filename
+      */
     public static String extractFilename(String filename) {
         // Find the last occurrence of the file separator
         int lastSeparatorIndex = filename.lastIndexOf('/');
@@ -161,6 +211,12 @@ public class FileSystem {
         return filenameOnly;
     }
 
+    /**
+      * Formats the file size in a human-readable format.
+      *
+      * @param sizeInBytes the size of the file in bytes
+      * @return the formatted file size
+      */
     public static String formatFileSize(long sizeInBytes) {
         final String[] units = {"B", "KB", "MB", "GB", "TB"};
         double size = sizeInBytes;
@@ -172,8 +228,14 @@ public class FileSystem {
         }
 
         return String.format("%.2f %s", size, units[unitIndex]);
-    }    
+    }
 
+    /**
+      * Reads all metadata information from a file.
+      *
+      * @param file the file to read metadata from
+      * @return a set of MetadataInfo objects containing the metadata information
+      */
     public static Set<MetadataInfo> readMetadata(File file) {
         setStatusCode(StatusCode.NO_ERROR);
         Set<MetadataInfo> metadataSet = new HashSet<>();
@@ -198,6 +260,13 @@ public class FileSystem {
         return metadataSet;
     }   
 
+    /**
+      * Compares two files to check if they are identical.
+      *
+      * @param path1 the path of the first file
+      * @param path2 the path of the second file
+      * @return true if the files are identical, false otherwise
+      */
     public static boolean compareFiles(String path1, String path2) {
         setStatusCode(StatusCode.NO_ERROR);
 

@@ -1,5 +1,8 @@
 package cz.cuni.mff.stankoti.photo.status;
 
+/**
+  * Enum representing various status codes for the Photo application.
+  */
 public enum StatusCode {
     NO_ERROR,
     UNKNOWN_COMMAND,

@@ -5,9 +5,15 @@ import java.util.Map;
 import cz.cuni.mff.stankoti.photo.status.StatusCode;
 import cz.cuni.mff.stankoti.photo.status.StatusMessages;
 
+/**
+  * A class with methods for displaying various information to the user.
+  */
 public class View {
+    /**
+      * Displays information about the Photo application.
+      */
     public void fullProgramInfo() {
-        String version = "0.9";
+        String version = "1.0";
         String projectName = "Photo Organizer";
         String course = "Programming in Java Language - NPRG013 - student project";
         String author = "Tijana Stankovic";
@@ -22,15 +28,29 @@ public class View {
         System.out.println();
     }
 
+    /**
+      * Prints a prompt symbol to the screen.
+      */
     public void printPrompt() {
         String prompt = "> ";
         System.out.print(prompt);
     }
 
+    /**
+      * Prints a line of text to the screen.
+      * 
+      * @param line the line of text to be printed
+      */
     public void print(String line) {
         System.out.println(line);
     }
 
+    /**
+      * Prints a line of text to the screen, with or without a new line.
+      * 
+      * @param line the line of text to be printed
+      * @param newLine if true, prints a new line after the text; if false, prints the text without a new line
+      */
     public void print(String line, boolean newLine) {
         if (newLine) {
             System.out.println(line);
@@ -38,11 +58,21 @@ public class View {
             System.out.print(line);
         }
     }
-        
+
+    /**
+      * Prints the status message corresponding to the given status code.
+      * 
+      * @param statusCode the status code for which the message is to be printed
+      */
     public void printStatus(StatusCode statusCode) {
         System.out.printf(StatusMessages.getStatusMessage(statusCode) + "%n");
     }
 
+    /**
+      * Prints the current database statistics.
+      * 
+      * @param dbStatistics a map containing the database statistics
+      */
     public void printDBStatistics(Map<String, Integer> dbStatistics) {
         print("Current database statistics:");
         int fileCount = dbStatistics.get("FILES");

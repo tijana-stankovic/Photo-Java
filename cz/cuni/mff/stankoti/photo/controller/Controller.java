@@ -4,6 +4,12 @@ import cz.cuni.mff.stankoti.photo.status.StatusCode;
 import cz.cuni.mff.stankoti.photo.db.*;
 import cz.cuni.mff.stankoti.photo.view.*;
 
+/**
+  * The top-level class of the Controller.
+  * <p>
+  * It initializes the other Controller parts and executes the main application loop.
+  * </p>
+  */
 public class Controller {
     private View view;
     private DB db;
