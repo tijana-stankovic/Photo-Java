@@ -5,9 +5,18 @@ import java.io.Serializable;
 /**
   * This class is a supporting structure for one metadata tag.
   */
-public class MetadataInfo implements Serializable {  // Implement the Serializable interface
+public class MetadataInfo implements Serializable {  // implement the Serializable interface
+    /**
+      * The metadata tag's directory.
+      */
     private String directory;
+    /**
+      * The metadata tag's name.
+      */
     private String tag;
+    /**
+      * A description of the tag's value.
+      */
     private String description;
 
     /**
@@ -16,7 +25,7 @@ public class MetadataInfo implements Serializable {  // Implement the Serializab
       *
       * @param directory the metadata tag's directory
       * @param tag the metadata tag's name
-      * @param description a brief description of the tag's value
+      * @param description a description of the tag's value
       */
     public MetadataInfo(String directory, String tag, String description) {
         setDirectory(directory);

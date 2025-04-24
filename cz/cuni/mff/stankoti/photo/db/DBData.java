@@ -15,21 +15,75 @@ import java.util.Set;
   * It contains the internal structure and provides methods for manipulating data (files, folders, keywords, etc.) in the database.
   * </p>
   */
-public class DBData implements Serializable {  // Implement the Serializable interface
+public class DBData implements Serializable {  // implement the Serializable interface
+    /**
+      * Unique identifier for the serialized class version.
+      */
     private static final long serialVersionUID = 1L;
+    /**
+      * Last used ID of the file object.
+      */
     private int lastFileID;
+    /**
+      * File object ID index.
+      * Mapping the file object ID to the corresponding file object in the database.
+      */
     private Map<Integer, DBFile> files;
+    /**
+      * Absolute filename path index.
+      * Mapping (1:1) the absolute filename path (including filename) to the ID of corresponding file object in the database.
+      */
     private Map<String, Integer> fullpaths;
+    /**
+      * Location (directory) index.
+      * Mapping the directory to the set of files located in that directory.
+      */
     private Map<String, Set<Integer>> locations;
+    /**
+      * Filename index.
+      * Mapping the filename to the set of files with that filename.
+      */
     private Map<String, Set<Integer>> filenames;
+    /**
+      * File extension index.
+      * Mapping the extension to the set of files with that extention.
+      */
     private Map<String, Set<Integer>> extensions;
+    /**
+      * Timestamp index.
+      * Mapping the timestamp to the set of files with that timestamp.
+      */
     private Map<String, Set<Integer>> timestamps;
+    /**
+      * Size index.
+      * Mapping the file size to the set of files with that size.
+      */
     private Map<Long, Set<Integer>> sizes;
+    /**
+      * Checksum index.
+      * Mapping checksum values to the set of files that have that checksum.
+      */
     private Map<Long, Set<Integer>> checksums;
+    /**
+      * Keyword index.
+      * Mapping the keyword to the set of files associated with that keyword.
+      */
     private Map<String, Set<Integer>> keywords;
+    /**
+      * Metadata tag index.
+      * Mapping the metadata tag to the set of files containing that tag.
+      */
     private Map<String, Set<Integer>> metadataTags;
-    private Set<Integer> duplicates; // list of all files with at least one duplicate
-    private Set<Integer> potentialDuplicates; // list of all files with at least one potential duplicate
+    /**
+      * Duplicates index.
+      * Set of all file object IDs with at least one duplicate
+      */
+    private Set<Integer> duplicates;
+    /**
+      * Duplicates index.
+      * Set of all file object IDs with at least one potential duplicate
+      */
+    private Set<Integer> potentialDuplicates;
 
     /**
       * Default constructor for database initialization.

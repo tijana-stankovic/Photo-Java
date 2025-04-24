@@ -27,26 +27,35 @@ import com.drew.metadata.Tag;
   * A class with methods for file system access and reading directories, files, and metadata information.
   */
 public class FileSystem {
-    private static StatusCode statusCode;
-
     /**
-      * Gets the last FileSystem status code.
+      * Status code of the last executed File System operation.
+      */
+    private static StatusCode statusCode;
+    
+    /**
+      * Gets the last FileSystem operation status code.
       *
-      * @return the last FileSystem status code
+      * @return the last FileSystem operation status code
       */
     public static StatusCode getStatusCode() {
         return statusCode;
     }
 
     /**
-      * Sets a FileSystem status code.
+      * Sets a FileSystem operation status code.
       *
-      * @param newStatusCode the FileSystem new status code
+      * @param newStatusCode the FileSystem operation status code
       */
     public static void setStatusCode(StatusCode newStatusCode) {
         statusCode = newStatusCode;
     }
 
+    /**
+      * Default constructor.
+      * (defined to prevent Javadoc warning)
+      */
+    public FileSystem() {}
+        
     /**
       * Checks the type of the given path.
       *
@@ -58,12 +67,12 @@ public class FileSystem {
 
         if (file.exists()) {
             if (file.isFile()) {
-                return 'F'; // It's a file
+                return 'F'; // it's a file
             } else if (file.isDirectory()) {
-                return 'D'; // It's a directory
+                return 'D'; // it's a directory
             }
         }
-        return 'E'; // Path doesn't exist
+        return 'E'; // path doesn't exist
     }
 
     /**
@@ -123,17 +132,17 @@ public class FileSystem {
             if (file.isFile()) {
                 fullpath = file.getCanonicalPath(); // full filepath
 
-                String parentPath = file.getParent(); // Absolute parent path
+                String parentPath = file.getParent(); // absolute parent path
                 location = parentPath != null ? new File(parentPath).getCanonicalPath() : "";
 
-                String fullName = file.getName();   // Filename with extension
+                String fullName = file.getName();   // filename with extension
                 int lastDotIndex = fullName.lastIndexOf('.');
                 if (lastDotIndex > 0 && lastDotIndex < fullName.length() - 1) {
-                    // File has an extension
+                    // file has an extension
                     fname = fullName.substring(0, lastDotIndex);
                     extension = fullName.substring(lastDotIndex + 1);
                 } else {
-                    // No extension or starts with dot
+                    // no extension or starts with dot
                     fname = fullName;
                 }
 
@@ -143,7 +152,7 @@ public class FileSystem {
                 dbFile.setExtension(extension);
 
                 // HH for 24-hour format
-                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss").withZone(ZoneId.systemDefault());  // Use system timezone
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd HHmmss").withZone(ZoneId.systemDefault());  // use system timezone
                 timestamp = formatter.format(Instant.ofEpochMilli(file.lastModified()));
 
                 size = file.length();
@@ -199,13 +208,13 @@ public class FileSystem {
       * @return the extracted filename
       */
     public static String extractFilename(String filename) {
-        // Find the last occurrence of the file separator
+        // find the last occurrence of the file separator
         int lastSeparatorIndex = filename.lastIndexOf('/');
         if (lastSeparatorIndex == -1) {
             lastSeparatorIndex = filename.lastIndexOf('\\');
         }
     
-        // Extract the filename
+        // extract the filename
         String filenameOnly = (lastSeparatorIndex == -1) ? filename : filename.substring(lastSeparatorIndex + 1);
     
         return filenameOnly;

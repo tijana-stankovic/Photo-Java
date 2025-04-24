@@ -9,6 +9,12 @@ import cz.cuni.mff.stankoti.photo.controller.*;
   */
 public class Photo {
     /**
+      * Default constructor.
+      * (defined to prevent Javadoc warning)
+      */
+    public Photo() {}
+
+    /**
       * The starting point of the application.
       * <p>
       * This method is called when the program starts. 

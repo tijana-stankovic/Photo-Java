@@ -8,7 +8,9 @@ import java.util.HashMap;
 public class StatusMessages {
     private static final HashMap<StatusCode, String> statusMessages = new HashMap<>();
 
-    // Initializes the status messages for each status code.
+    /**
+      * Initializes the status messages for each status code.
+      */
     static {
         statusMessages.put(StatusCode.NO_ERROR, "No error.");
         statusMessages.put(StatusCode.UNEXPECTED_STATUS, "WARNING: Unexpected program status.");
@@ -27,6 +29,12 @@ public class StatusMessages {
         statusMessages.put(StatusCode.FILE_SYSTEM_NOT_FILE, "WARNING: Not a file.");
         statusMessages.put(StatusCode.FILE_SYSTEM_NOT_IMAGE, "WARNING: File is not an image.");
     }
+
+    /**
+      * Default constructor.
+      * (defined to prevent Javadoc warning)
+      */
+      public StatusMessages() {}   
 
     /**
       * Returns the message corresponding to the given status code.

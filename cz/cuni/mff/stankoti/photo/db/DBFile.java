@@ -9,20 +9,59 @@ import java.util.Set;
 /**
   * This class contains structures and methods for handling information related to a single file.
   */
-public class DBFile implements Serializable {  // Implement the Serializable interface
+public class DBFile implements Serializable {  // implement the Serializable interface
+    /**
+      * Unique identifier for the serialized class version.
+      */
     private static final long serialVersionUID = 1L;
+    /**
+      * File object unique identifier.
+      */
     private int id;
+    /**
+      * File absolute path (including filename).
+      */
     private String fullpath;
+    /**
+      * File location (directory).
+      */
     private String location;
+    /**
+      * File filename only (without path and extension).
+      */
     private String filename;
+    /**
+      * File extension.
+      */
     private String extension;
+    /**
+      * File timestamp.
+      */
     private String timestamp;
+    /**
+      * File size.
+      */
     private long size;
+    /**
+      * File CRC32 checksum.
+      */
     private long checksum;
+    /**
+      * Set of keywords associated with the file.
+      */
     private Set<String> keywords;
+    /**
+      * Set of metadata tags contained in the file.
+      */
     private Set<MetadataInfo> metadata;
-    private Set<Integer> duplicates; // list of duplicates of this file
-    private Set<Integer> potentialDuplicates; // list of potential duplicates of this file
+    /**
+      * Set of exact duplicates of this file.
+      */
+    private Set<Integer> duplicates;
+    /**
+      * Set of potential duplicates of this file.
+      */
+    private Set<Integer> potentialDuplicates;
 
     /**
       * Default constructor required for deserialization.

@@ -8,20 +8,30 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
-  * A class with methods for handling user input.
+  * Command Line Interface (CLI) class with methods for handling user input.
   */
-public class CLI implements AutoCloseable {
+public class CLI implements AutoCloseable { // implements AutoCloseable to ensure resources are properly closed
     private BufferedReader input;
 
+    /**
+      * Creates a new CLI instance and initializes the input reader.
+      */
     public CLI() {
         input = new BufferedReader(new InputStreamReader(System.in));
     }
 
+    /**
+      * Reads a command from the user input.
+      * Parses the input line into a command and its arguments.
+      * Allows multi-word arguments to be entered within quotes.
+      *
+      * @return a Command object containing the command and its arguments
+      */
     public Command readCommand() {
         ArrayList<String> argList = new ArrayList<>();
     
         try {
-            // Read data from standard input
+            // read data from standard input
             String line = input.readLine();
             if (line != null) {
                 StringBuilder currentWord = new StringBuilder();
@@ -35,7 +45,7 @@ public class CLI implements AutoCloseable {
                             insideQuotes = true;
                         } else {
                             insideQuotes = false;
-                            // Closing quote, add the quoted parameter
+                            // closing quote, add the quoted parameter
                             argList.add(currentWord.toString());
                             currentWord.setLength(0);
                         }
@@ -49,7 +59,7 @@ public class CLI implements AutoCloseable {
                     }
                 }
 
-                // If there is no closing quote, add the last word
+                // if there is no closing quote, add the last word
                 if (currentWord.length() > 0) {
                     argList.add(currentWord.toString());
                 }
@@ -75,6 +85,15 @@ public class CLI implements AutoCloseable {
         return command;
     }
     
+    /**
+      * Asks the user a yes/no question and returns the response.
+      * Optionally includes a cancel option.
+      *
+      * @param view the View object instance (which is used to display message)
+      * @param message the message (question) to display
+      * @param cancel whether to include a cancel option
+      * @return 'Y' for yes, 'N' for no, 'C' for cancel (if cancel is true)
+      */
     public char askYesNo(View view, String message, boolean cancel) {
         String prompt = cancel ? " (Yes/No/Cancel)" : " (Yes/No)";
         String response;
@@ -100,6 +119,10 @@ public class CLI implements AutoCloseable {
         }
     }
 
+    /**
+      * Closes the input reader.
+      * Ensures resources are properly released.
+      */
     @Override
     public void close() {
         try {

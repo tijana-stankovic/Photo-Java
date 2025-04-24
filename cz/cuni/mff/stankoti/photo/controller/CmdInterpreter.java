@@ -14,18 +14,40 @@ import java.util.ArrayList;
 import java.util.Set;
 
 /**
-  * The main processing class of the Controller.
+  * This is the Command Interpreter - the main processing class of the Controller.
   * <p>
   * It executes all commands of the Photo application and is responsible for communication with the Model and View parts
   * </p>
   */
 public class CmdInterpreter {
+    /**
+      * Model instance with which the Command Interpreter communicates.
+      */
     private DB db;
+    /**
+      * View instance with which the Command Interpreter communicates.
+      */
     private View view;
+    /**
+      * Status code of the last executed command.
+      */
     private StatusCode statusCode;
+    /**
+      * A flag indicating whether an exit from the application has been requested.
+      */
     private boolean quitSignal;
+    /**
+      * CLI instance used by the Command Interpreter for handling user input.
+      */
     private CLI cli;
 
+    /**
+      * Creates a new Command interpreter instance.
+      * It will communicate with the specified database and view instances.
+      *
+      * @param db the database instance
+      * @param view the view instance
+      */
     public CmdInterpreter(DB db, View view) {
         this.db = db;
         this.view = view;
@@ -34,26 +56,56 @@ public class CmdInterpreter {
         cli = null;
     }
 
+    /**
+      * Gets the last Command Interpreter operation status code.
+      *
+      * @return the last Command Interpreter operation status code
+      */
     public StatusCode getStatusCode() {
         return statusCode;
     }
 
+    /**
+      * Sets a Command Interpreter operation status code.
+      *
+      * @param statusCode the Command Interpreter operation status code
+      */
     public void setStatusCode(StatusCode statusCode) {
         this.statusCode = statusCode;
     }
 
+    /**
+      * Gets the quit signal status ('quit signal' = request to exit Photo application).
+      *
+      * @return true if the quit signal is set, false otherwise
+      */
     public boolean getQuitSignal() {
         return quitSignal;
     }
 
+    /**
+      * Sets the quit signal status.
+      *
+      * @param quitSignal the new quit signal status
+      */
     public void setQuitSignal(boolean quitSignal) {
         this.quitSignal = quitSignal;
     }
 
+    /**
+      * Sets the Command Line Interface (CLI) to be used in communication with the user.
+      *
+      * @param cli the command line interface instance
+      */
     public void setCLI(CLI cli) {
         this.cli = cli;
     }
 
+    /**
+      * Entry point for command processing. Executes the specified command.
+      *
+      * @param cmd the command to execute
+      */
     public void executeCommand(Command cmd) {
         setStatusCode(StatusCode.NO_ERROR);
 
@@ -83,6 +135,10 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * HELP command entry point. 
+      * Displays the help information (short description) for each command.
+      */
     private void help() {
         view.print("List of available commands:");
         view.print("- HELP (H)");
@@ -116,12 +172,14 @@ public class CmdInterpreter {
         view.print("- RK");
         view.print("  Short form for REMOVE KEYWORD command. For details, see REMOVE command.");
         view.print("- LIST (L)");
-        view.print("    - LIST <keyword> or <folder>");
+        view.print("    - LIST <keyword> or <folder> or <file>");
         view.print("      Lists all images that have the specified keyword or belong to the specified folder.");
         view.print("    - LIST KEYWORDS (LIST KEYS)");
         view.print("      Lists all existing keywords in the database.");
         view.print("    - LIST DIRECTORIES (LIST DIRS, LIST FOLDERS)");
         view.print("      Lists all existing directories (folders) in the database.");
+        view.print("    - LIST");
+        view.print("      Displays database statistics.");
         view.print("- LK");
         view.print("  Short form for LIST KEYWORDS command. For details, see LIST command.");
         view.print("- LD (LF)");
@@ -138,10 +196,19 @@ public class CmdInterpreter {
         view.print("  Compares the set of images determined by the given parameter with the current state on the disk.");
     }
 
+    /**
+      * ABOUT command entry point. 
+      * Displays information about the program.
+      */
     private void about() {
         view.fullProgramInfo();
     }
 
+    /**
+      * EXIT command entry point. 
+      * Sets the request (quit signal) for exiting the program.
+      * If there are unsaved changes, prompts the user to save them.
+      */
     private void exit() {
         if (db.isChanged()) {
             assert cli != null : "Interpreter CLI is not initialized!";
@@ -163,6 +230,13 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * SAVE command entry point. 
+      * Saves the current state of the database to a file.
+      * A new filename can be specified using the parameter (Save As function).
+      *
+      * @param args optional argument specifying the new filename
+      */
     private void save(String[] args) {
         if (args.length > 1) {
             setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
@@ -180,6 +254,9 @@ public class CmdInterpreter {
         save();
     }
 
+    /**
+      * Saves the current state of the database to the current DB file.
+      */
     private void save() {
         if (db.isChanged()) {
             db.WriteDB();
@@ -198,6 +275,13 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * ADD command entry point. 
+      * Adds a specified file or all files from the specified directory to the database, or 
+      * adds a specified keyword to a specified database file or all database files from the specified directory.
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void add(String[] args) {
         if (args.length >= 1 && (args[0].toUpperCase().equals("KEYWORD") || 
                                  args[0].toUpperCase().equals("KEY"))) {
@@ -223,6 +307,12 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * Adds a specified file to the database.
+      *
+      * @param filename the name of the file
+      * @param fullPath whether the full path of the file is provided
+      */
     private void addFile(String filename, boolean fullPath) {
         String filenameOnly = filename;
         if (fullPath) {
@@ -258,6 +348,11 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * Adds all files in a directory to the database.
+      *
+      * @param directory the path of the directory
+      */
     private void addDirectory(String directory) {
         view.print("Processing directory '" + directory + "'... ", false );
         List<String> listOfFiles = FileSystem.filesInDirectory(directory);
@@ -274,6 +369,12 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * AK command (ADD KEYWORD short form) entry point. 
+      * Adds a specified keyword to a specified database file or all database files from the specified directory.
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void addKeyword(String[] args) {
         if (args.length != 2) {
             setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
@@ -305,6 +406,12 @@ public class CmdInterpreter {
         } 
     }
 
+    /**
+      * Adds a keyword to a specified file.
+      *
+      * @param keyword the keyword to add
+      * @param fileID the ID of the file object
+      */
     private void addKeywordToFile(String keyword, int fileID) {
         DBFile file = db.getFile(fileID);
         view.print("Processing file '" + file.getFilename() + "." + file.getExtension() + "'... ", false );
@@ -312,6 +419,13 @@ public class CmdInterpreter {
         view.print("Ok (fileID = " + fileID + ").");
     }
 
+    /**
+      * REMOVE command entry point. 
+      * Removes a specified file or all files from the specified directory from the database, or 
+      * removes a specified keyword from a specified database file or all database files from the specified directory.
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void remove(String[] args) {
         if (args.length >= 1 && (args[0].toUpperCase().equals("KEYWORD") || 
                                  args[0].toUpperCase().equals("KEY"))) {
@@ -345,6 +459,11 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * Removes a specified file from the database.
+      *
+      * @param fileID the ID of the file object to remove
+      */
     private void removeFile(int fileID) {
         DBFile file = db.getFile(fileID);
         view.print("Processing file '" + file.getFilename() + "." + file.getExtension() + "'... ", false );
@@ -352,6 +471,12 @@ public class CmdInterpreter {
         view.print("Removed.");
     }
 
+    /**
+      * RK command (REMOVE KEYWORD short form) entry point. 
+      * Removes a specified keyword from a specified database file or all database files from the specified directory.
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void removeKeyword(String[] args) {
         if (args.length != 2) {
             setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
@@ -383,6 +508,12 @@ public class CmdInterpreter {
         } 
     }
 
+    /**
+      * Removes a keyword from a specified file.
+      *
+      * @param keyword the keyword to remove
+      * @param fileID the ID of the file object
+      */
     private void removeKeywordFromFile(String keyword, int fileID) {
         DBFile file = db.getFile(fileID);
         view.print("Processing file '" + file.getFilename() + "." + file.getExtension() + "'... ", false );
@@ -390,6 +521,14 @@ public class CmdInterpreter {
         view.print("Ok (fileID = " + fileID + ").");
     }
 
+    /**
+      * LIST command entry point.
+      * Based on the provided arguments, lists all files with specified keyword or in specified directory, or
+      * list all existing directories or keywords, or
+      * display current database statistics.
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void list(String[] args) {
         if (args.length >= 1 && (args[0].toUpperCase().equals("KEYWORDS") || 
                                  args[0].toUpperCase().equals("KEYS"))) {
@@ -407,6 +546,13 @@ public class CmdInterpreter {
         list(args, false);
     }
 
+    /**
+      * Based on the provided arguments, lists all files with specified keyword or in specified directory, or
+      * specified file only, or display current database statistics.
+      *
+      * @param args file or folder or keyword or, if empty, show db statistics
+      * @param allDetails if true, print additional details
+      */
     private void list(String[] args, Boolean allDetails) {
         if (args.length == 0) {
             view.printDBStatistics(db.getDBStatistics());
@@ -462,6 +608,12 @@ public class CmdInterpreter {
         } 
     }
 
+    /**
+      * Lists information about a specific file based on the details level.
+      *
+      * @param fileID the ID of the file object
+      * @param detailsLevel the level of details to print ('F' - file info, 'D' - directory info, 'A' - all information)
+      */
     private void listFileInfo(int fileID, Character detailsLevel) {
         DBFile file = db.getFile(fileID);
 
@@ -536,6 +688,12 @@ public class CmdInterpreter {
         } 
     }
 
+    /**
+      * Formats a date-time string into a more readable format.
+      *
+      * @param dateTime the date-time string, in the format: 'yyyymmdd hh24miss'
+      * @return the formatted date-time string, in the format: 'dd.mm.yyyy hh24:mi:ss'
+      */
     private String formatedDateTime(String dateTime) {
         String year = dateTime.substring(0, 4);
         String month = dateTime.substring(4, 6);
@@ -547,6 +705,12 @@ public class CmdInterpreter {
         return formattedDateTime;
     }
 
+    /**
+      * LK command (LIST KEYWORD short form) entry point. 
+      * Lists all keywords in the database.
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void listKeywords(String[] args) {
         if (args.length > 0) {
             setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
@@ -560,6 +724,12 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * LD command (LIST DIRECTORIES short form) entry point. 
+      * Lists all directories in the database.
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void listDirectories(String[] args) {
         if (args.length > 0) {
             setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
@@ -573,10 +743,24 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * DETAILS command entry point. 
+      * Based on the provided arguments, shows details of all files with specified keyword or in specified directory, or
+      * specified file only.     
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void details(String[] args) {
         list(args, true);
     }
 
+    /**
+      * DUPLICATES command entry point. 
+      * Based on the provided arguments, finds and marks duplicates of all files with specified keyword or 
+      * in specified directory, or specified file only.
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void duplicates(String[] args) {
         if (args.length != 1) {
             setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
@@ -617,15 +801,23 @@ public class CmdInterpreter {
         } 
     }
 
+    /**
+      * Finds and marks in the database duplicates of specified file.
+      *
+      * @param fileID the ID of the file object whose duplicates it is looking for
+      * @param allDuplicatesFound the map containing all found duplicates
+      */
     private void findDuplicates(int fileID, Map<Integer, Integer> allDuplicatesFound) {
         DBFile file = db.getFile(fileID);
         view.print(file.getFullpath() + "... ", false );
 
-        Integer numOfDuplicates = allDuplicatesFound.get(fileID);
-        if (numOfDuplicates == null) {
-            Map<Integer, Integer> newDuplicatesFound = db.processDuplicates(fileID);
-            allDuplicatesFound.putAll(newDuplicatesFound);
-            numOfDuplicates = allDuplicatesFound.get(fileID);
+        // allDuplicatesFound contains all previously found duplicates,
+        // so, this allows to avoid processing already processed field IDs
+        Integer numOfDuplicates = allDuplicatesFound.get(fileID); // get number of duplicates of fileID
+        if (numOfDuplicates == null) { // if fileID has not yet been processed
+            Map<Integer, Integer> newDuplicatesFound = db.processDuplicates(fileID); // finds and marks duplicates of fileID
+            allDuplicatesFound.putAll(newDuplicatesFound); // add found duplicates info to allDuplicatesFound
+            numOfDuplicates = allDuplicatesFound.get(fileID); // get number of duplicates of fileID
         }
         if (numOfDuplicates != null) {
             view.print(numOfDuplicates + " duplicate(s)" );
@@ -634,6 +826,14 @@ public class CmdInterpreter {
         }
     }
 
+    /**
+      * SCAN command entry point.
+      * Based on the provided arguments, compares information of all files with the specified keyword,
+      * in the specified directory, or the specified file only, with the current file information from the disk.
+      * Changed files are marked as CHANGED or DELETED.
+      *
+      * @param args the arguments of the command (see 'HELP' command for details)
+      */
     private void scan(String[] args) {
         if (args.length != 1) {
             setStatusCode(StatusCode.INVALID_NUMBER_OF_ARGUMENTS);
@@ -670,15 +870,21 @@ public class CmdInterpreter {
         } 
     }
 
+    /**
+      * Compares the database information of the specified file with the current file information from the disk.
+      * The changed file is marked as CHANGED or DELETED.
+      *
+      * @param fileID the ID of the file object to be compared
+      */
     private void scanFile(int fileID) {
-        DBFile oldFileInfo = db.getFile(fileID);
-        view.print(oldFileInfo.getFullpath() + "... ", false );
+        DBFile dbFileInfo = db.getFile(fileID);
+        view.print(dbFileInfo.getFullpath() + "... ", false );
 
-        DBFile newFileInfo = FileSystem.getFileInformation(oldFileInfo.getFullpath());
+        DBFile currentFileInfo = FileSystem.getFileInformation(dbFileInfo.getFullpath());
 
         switch (FileSystem.getStatusCode()) {
             case StatusCode.NO_ERROR -> {
-                if (fileChanged(oldFileInfo, newFileInfo)) {
+                if (fileChanged(dbFileInfo, currentFileInfo)) {
                     db.addKeyword("CHANGED", fileID);
                     db.removeKeyword("DELETED", fileID);
                     view.print("CHANGED.");
@@ -710,23 +916,31 @@ public class CmdInterpreter {
         }
     }
 
-    Boolean fileChanged(DBFile oldFileInfo, DBFile newFileInfo) {
-        Set<MetadataInfo> oldMetadata = oldFileInfo.getMetadata();
-        Set<MetadataInfo> newMetadata = newFileInfo.getMetadata();
+    /**
+      * Checks if a file has changed by comparing information in the database with 
+      * the current file state on the disk.
+      *
+      * @param dbFileInfo the file object containing information from the database
+      * @param currentFileInfo the file object containing current information from the disk
+      * @return true if the file has changed, false otherwise
+      */
+    Boolean fileChanged(DBFile dbFileInfo, DBFile currentFileInfo) {
+        Set<MetadataInfo> dbMetadata = dbFileInfo.getMetadata();
+        Set<MetadataInfo> currentMetadata = currentFileInfo.getMetadata();
 
-        if (!oldFileInfo.getTimestamp().equals(newFileInfo.getTimestamp()) ||
-            oldFileInfo.getSize() != newFileInfo.getSize() ||
-            oldFileInfo.getChecksum() != newFileInfo.getChecksum() || 
-            oldMetadata.size() != newMetadata.size()) {
+        if (!dbFileInfo.getTimestamp().equals(currentFileInfo.getTimestamp()) ||
+            dbFileInfo.getSize() != currentFileInfo.getSize() ||
+            dbFileInfo.getChecksum() != currentFileInfo.getChecksum() || 
+            dbMetadata.size() != currentMetadata.size()) {
             return true;
         }
         
-        for (MetadataInfo oldMetadataInfo : oldMetadata) {
+        for (MetadataInfo dbMetadataInfo : dbMetadata) {
             boolean found = false;
-            for (MetadataInfo newMetadataInfo : newMetadata) {
-                if (oldMetadataInfo.getDirectory().equals(newMetadataInfo.getDirectory()) &&
-                    oldMetadataInfo.getTag().equals(newMetadataInfo.getTag()) &&
-                    oldMetadataInfo.getDescription().equals(newMetadataInfo.getDescription())) {
+            for (MetadataInfo currentMetadataInfo : currentMetadata) {
+                if (dbMetadataInfo.getDirectory().equals(currentMetadataInfo.getDirectory()) &&
+                    dbMetadataInfo.getTag().equals(currentMetadataInfo.getTag()) &&
+                    dbMetadataInfo.getDescription().equals(currentMetadataInfo.getDescription())) {
                     found = true;
                     break;
                 }

@@ -7,7 +7,7 @@ import cz.cuni.mff.stankoti.photo.view.*;
 /**
   * The top-level class of the Controller.
   * <p>
-  * It initializes the other Controller parts and executes the main application loop.
+  * It initializes the other application and Controller parts and executes the main application loop.
   * </p>
   */
 public class Controller {
@@ -15,6 +15,13 @@ public class Controller {
     private DB db;
     private CmdInterpreter interpreter;
 
+    /**
+      * Creates a new Controller instance.
+      * Initializes the view, database, and command interpreter.
+      * Displays the full program information and database statistics.
+      *
+      * @param args can contain the name of the external file from which the database data is read
+      */
     public Controller(String[] args) {
         view = new View();
         view.fullProgramInfo();
@@ -35,6 +42,13 @@ public class Controller {
         interpreter = new CmdInterpreter(db, view);
     }
 
+    /**
+      * Determines the database filename based on the provided arguments.
+      * If no arguments are provided, uses the default database filename.
+      *
+      * @param args can contain the name of the external file
+      * @return the database filename
+      */
     private String getFilename(String[] args) {
         String fileName;
 
@@ -52,6 +66,10 @@ public class Controller {
         return fileName;
     }
 
+    /**
+      * Runs the main application loop.
+      * Initializes the command-line interface and processes user commands until the quit signal is received.
+      */
     public void run() {
         view.print("");
         try (CLI cli = new CLI()) {

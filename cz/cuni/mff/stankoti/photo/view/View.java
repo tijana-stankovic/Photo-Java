@@ -10,6 +10,12 @@ import cz.cuni.mff.stankoti.photo.status.StatusMessages;
   */
 public class View {
     /**
+      * Default constructor.
+      * (defined to prevent Javadoc warning)
+      */
+    public View() {}
+
+    /**
       * Displays information about the Photo application.
       */
     public void fullProgramInfo() {

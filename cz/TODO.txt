@@ -1,5 +1,5 @@
-- Komentari
-- Test primeri
+- dopuni uputstvo
+- test primeri
 
 
 =======================================================
