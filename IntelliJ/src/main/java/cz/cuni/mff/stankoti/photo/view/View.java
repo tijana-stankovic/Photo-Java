@@ -71,7 +71,7 @@ public class View {
       * @param statusCode the status code for which the message is to be printed
       */
     public void printStatus(StatusCode statusCode) {
-        System.out.printf(StatusMessages.getStatusMessage(statusCode) + "%n");
+        System.out.println(StatusMessages.getStatusMessage(statusCode));
     }
 
     /**

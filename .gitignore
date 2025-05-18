@@ -2,6 +2,9 @@
 # Photo Organizer database files
 *.pdb
 
+# IntelliJ
+IntelliJ/target/
+
 # Compiled class file
 *.class
 

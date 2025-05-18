@@ -4,11 +4,13 @@
 
 =======================================================
 Startovanje iz komandne linije:
-- postavi se u root dir projekta
+- postavi se u root dir projekta (ispod koga je subfolder cz)
 - prevedi sve .java fajlove sa:
-    javac cz/cuni/mff/stankoti/photo/*.java
+    //javac -cp "lib/metadata-extractor-2.19.0.jar:lib/xmpcore-6.1.11.jar" cz/cuni/mff/stankoti/photo/**/*.java
+    find cz -name "*.java" > sources.txt   (ovo samo jednom, osim kada dodajes neki novi .java fajl)
+    javac -cp ".:lib/*" @sources.txt
 - pokretanje programa sa:
-    java cz.cuni.mff.stankoti.photo.Photo
+    java -cp ".:lib/*" cz.cuni.mff.stankoti.photo.Photo
 
 =======================================================
 Ovo sam probao, ali nije htelo da radi:

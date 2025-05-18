@@ -207,7 +207,7 @@ public class DBFile implements Serializable {  // implement the Serializable int
       * @param extension the file extension
       */
     public void setExtension(String extension) {
-        assert extension != null && !extension.isEmpty() : "Extension must be specified!";
+        assert extension != null : "Extension must be specified!";
         this.extension = extension;
     }
 

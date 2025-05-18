@@ -681,11 +681,16 @@ public class CmdInterpreter {
             }
 
             view.print(prefix + "Metadata:");
+            List<String> metadataList = new ArrayList<>();
             for (var metadataTag : file.getMetadata()) {
-                view.print(prefix + prefix + metadataTag.getDirectory() + " " + metadataTag.getTag() + " " + metadataTag.getDescription());
+                metadataList.add(metadataTag.getDirectory() + " " + metadataTag.getTag() + " " + metadataTag.getDescription());
+            }
+            metadataList.sort(null);
+            for (String line : metadataList) {
+                view.print(prefix + prefix + line);
             }
             view.print("------------------------------------------------------");
-        } 
+        }
     }
 
     /**
